@@ -1,0 +1,30 @@
+[package]
+name = "tsp-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Pure domain types and state machine for the F1 trackside light panel simulator."
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = []
+# Enable ts-rs derives so the WS wire types can emit TypeScript bindings.
+# Used by the binding-generation step in Phase 3 (`cargo test --features ts-rs`).
+ts-rs = ["dep:ts-rs"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+ts-rs = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+serde_json = { workspace = true }

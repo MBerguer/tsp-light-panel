@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc c1f3987ff0737eb04551dc67dd69ef6880c614c33d43805410d047cab697e6e3 # shrinks to steps = [Step { panel: 4, cmd: PanelCommand { id: CommandId(28348579-8301-49f7-b71c-46b114c0aabd), source: RaceControl { operator: OperatorId(12b6d6fa-4ee1-49ce-a839-57eb096c636b) }, target: Global, flag: Chequered, timestamp: 2026-06-08T13:55:29.185421Z } }, Step { panel: 4, cmd: PanelCommand { id: CommandId(d5f39ae6-6a7d-410d-b4af-d62b7380a7af), source: RaceControl { operator: OperatorId(12b6d6fa-4ee1-49ce-a839-57eb096c636b) }, target: Panel(PanelId(4)), flag: Green, timestamp: 2026-06-08T13:55:29.185423Z } }]

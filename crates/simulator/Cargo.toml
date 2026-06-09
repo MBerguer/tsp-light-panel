@@ -1,0 +1,30 @@
+[package]
+name = "tsp-simulator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+description = "Phase 2: scriptable scenarios + replay engine for the simulator."
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+tsp_core = { workspace = true }
+tsp_eventstore = { workspace = true }
+tsp_server = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yml = { workspace = true }
+tokio = { workspace = true, features = ["test-util"] }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["test-util", "macros"] }
+tracing-subscriber = { workspace = true }

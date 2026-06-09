@@ -1,0 +1,24 @@
+/target
+**/*.rs.bk
+Cargo.lock.bak
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Event store data
+/data/
+*.eventlog
+*.snapshot
+
+# Frontend
+/web/node_modules
+/web/dist
+/web/.vite
+*.tsbuildinfo
+
+# Debug / walkthrough screenshots (regenerated on demand, not source of truth)
+/monza-*.png
+/monza_*.png
+/wt_*.png
+/.playwright-mcp/
