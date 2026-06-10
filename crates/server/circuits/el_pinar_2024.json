@@ -1,0 +1,1141 @@
+{
+  "name": "el_pinar_2024",
+  "label": "Autódromo Víctor Borrat Fabini — TCR World Tour & TCR SA 2024",
+  "viewport": {
+    "width": 1200,
+    "height": 800
+  },
+  "track_length_m": 3120,
+  "racing_line": [
+    [
+      614.86,
+      421.93
+    ],
+    [
+      611.92,
+      405.12
+    ],
+    [
+      607,
+      393.11
+    ],
+    [
+      600.48,
+      382.05
+    ],
+    [
+      591.58,
+      370.22
+    ],
+    [
+      584.39,
+      363.05
+    ],
+    [
+      575.21,
+      355.5
+    ],
+    [
+      564.21,
+      349.24
+    ],
+    [
+      551.43,
+      344.37
+    ],
+    [
+      508,
+      335.48
+    ],
+    [
+      500.54,
+      336.01
+    ],
+    [
+      493.07,
+      337.82
+    ],
+    [
+      487.54,
+      340.98
+    ],
+    [
+      484.18,
+      344.13
+    ],
+    [
+      481.19,
+      350.41
+    ],
+    [
+      479.4,
+      356.69
+    ],
+    [
+      474.22,
+      386.13
+    ],
+    [
+      469.77,
+      394.61
+    ],
+    [
+      464.92,
+      401.53
+    ],
+    [
+      459.31,
+      406.79
+    ],
+    [
+      452.51,
+      410.09
+    ],
+    [
+      442.89,
+      412.46
+    ],
+    [
+      431.48,
+      412.48
+    ],
+    [
+      403.04,
+      406.66
+    ],
+    [
+      394.38,
+      402.33
+    ],
+    [
+      388.49,
+      397.99
+    ],
+    [
+      384.03,
+      392.64
+    ],
+    [
+      381.54,
+      386.9
+    ],
+    [
+      379.08,
+      379.74
+    ],
+    [
+      378.41,
+      372.78
+    ],
+    [
+      379.44,
+      365.24
+    ],
+    [
+      382.26,
+      356.13
+    ],
+    [
+      388.29,
+      343.44
+    ],
+    [
+      396.81,
+      328.58
+    ],
+    [
+      406.45,
+      314.07
+    ],
+    [
+      417.88,
+      300.84
+    ],
+    [
+      430.68,
+      290.05
+    ],
+    [
+      446.66,
+      279.65
+    ],
+    [
+      460.17,
+      272.86
+    ],
+    [
+      471.81,
+      268.65
+    ],
+    [
+      486.42,
+      265.23
+    ],
+    [
+      503.72,
+      263.17
+    ],
+    [
+      522.05,
+      263.58
+    ],
+    [
+      536.51,
+      265.6
+    ],
+    [
+      551.41,
+      269.79
+    ],
+    [
+      592.13,
+      288.24
+    ],
+    [
+      603.21,
+      292.59
+    ],
+    [
+      613.16,
+      294.34
+    ],
+    [
+      622.91,
+      293.53
+    ],
+    [
+      632.53,
+      289.28
+    ],
+    [
+      638.86,
+      283.03
+    ],
+    [
+      646.02,
+      271.99
+    ],
+    [
+      651.43,
+      245.45
+    ],
+    [
+      656.21,
+      222.03
+    ],
+    [
+      668.48,
+      132.91
+    ],
+    [
+      672.85,
+      108.36
+    ],
+    [
+      675.38,
+      100.28
+    ],
+    [
+      677.66,
+      96.44
+    ],
+    [
+      681.01,
+      91.72
+    ],
+    [
+      683.79,
+      89.07
+    ],
+    [
+      689.23,
+      85.85
+    ],
+    [
+      695.21,
+      83.15
+    ],
+    [
+      699.1,
+      81.76
+    ],
+    [
+      781.93,
+      61.07
+    ],
+    [
+      787.31,
+      60.39
+    ],
+    [
+      792.62,
+      60.1
+    ],
+    [
+      799.32,
+      60
+    ],
+    [
+      804,
+      60.23
+    ],
+    [
+      806.71,
+      60.49
+    ],
+    [
+      809.12,
+      60.89
+    ],
+    [
+      811.69,
+      61.9
+    ],
+    [
+      813.74,
+      63.06
+    ],
+    [
+      815.7,
+      64.99
+    ],
+    [
+      817.11,
+      66.57
+    ],
+    [
+      818.36,
+      68.51
+    ],
+    [
+      820.56,
+      73.26
+    ],
+    [
+      821.54,
+      78.84
+    ],
+    [
+      821.59,
+      80.98
+    ],
+    [
+      821.18,
+      84.57
+    ],
+    [
+      820.55,
+      87.47
+    ],
+    [
+      819.48,
+      91.24
+    ],
+    [
+      817.89,
+      94.82
+    ],
+    [
+      810.99,
+      106.65
+    ],
+    [
+      808.58,
+      108.82
+    ],
+    [
+      807.32,
+      109.86
+    ],
+    [
+      805.38,
+      111.07
+    ],
+    [
+      802.02,
+      112.26
+    ],
+    [
+      797.91,
+      113.34
+    ],
+    [
+      794.38,
+      113.62
+    ],
+    [
+      791.2,
+      113.55
+    ],
+    [
+      788,
+      113.29
+    ],
+    [
+      780.63,
+      111.15
+    ],
+    [
+      771.07,
+      106.61
+    ],
+    [
+      759.57,
+      101.13
+    ],
+    [
+      749.74,
+      96.7
+    ],
+    [
+      744.88,
+      95.22
+    ],
+    [
+      739.62,
+      94.25
+    ],
+    [
+      732.92,
+      94.27
+    ],
+    [
+      728.57,
+      94.98
+    ],
+    [
+      725,
+      95.92
+    ],
+    [
+      721.43,
+      97.31
+    ],
+    [
+      718.5,
+      98.85
+    ],
+    [
+      715.97,
+      100.73
+    ],
+    [
+      713.74,
+      102.99
+    ],
+    [
+      711.83,
+      105.48
+    ],
+    [
+      709.48,
+      109.09
+    ],
+    [
+      707.38,
+      112.84
+    ],
+    [
+      705.74,
+      115.95
+    ],
+    [
+      704.29,
+      119.45
+    ],
+    [
+      703.01,
+      126.08
+    ],
+    [
+      702.36,
+      132.97
+    ],
+    [
+      703.3,
+      151.95
+    ],
+    [
+      705.38,
+      214.74
+    ],
+    [
+      706.38,
+      226.13
+    ],
+    [
+      710.24,
+      244.41
+    ],
+    [
+      730.81,
+      329.38
+    ],
+    [
+      819.03,
+      713.54
+    ],
+    [
+      819.82,
+      721.3
+    ],
+    [
+      819.37,
+      726.47
+    ],
+    [
+      818.53,
+      729.87
+    ],
+    [
+      816.08,
+      734.72
+    ],
+    [
+      811.9,
+      738.57
+    ],
+    [
+      806.17,
+      740
+    ],
+    [
+      799.83,
+      738.59
+    ],
+    [
+      796.38,
+      736.3
+    ],
+    [
+      792.53,
+      732.24
+    ],
+    [
+      786.87,
+      723.93
+    ],
+    [
+      761.42,
+      681.01
+    ],
+    [
+      738.53,
+      644.99
+    ],
+    [
+      717.64,
+      610.89
+    ],
+    [
+      647.47,
+      498.19
+    ],
+    [
+      633.84,
+      477.42
+    ],
+    [
+      624.49,
+      459.08
+    ],
+    [
+      619.32,
+      446.2
+    ],
+    [
+      617.33,
+      438.27
+    ],
+    [
+      614.86,
+      421.93
+    ]
+  ],
+  "zones": [
+    {
+      "id": 1,
+      "sector": 1,
+      "label": "Z1 · Recta de Boxes",
+      "hue": 30
+    },
+    {
+      "id": 2,
+      "sector": 1,
+      "label": "Z2 · C1 — Curva 1",
+      "hue": 50
+    },
+    {
+      "id": 3,
+      "sector": 1,
+      "label": "Z3 · Bicheón",
+      "hue": 80
+    },
+    {
+      "id": 4,
+      "sector": 2,
+      "label": "Z4 · Beco Passadore",
+      "hue": 130
+    },
+    {
+      "id": 5,
+      "sector": 2,
+      "label": "Z5 · El Tobogán",
+      "hue": 170
+    },
+    {
+      "id": 6,
+      "sector": 2,
+      "label": "Z6 · El Pasajero",
+      "hue": 210
+    },
+    {
+      "id": 7,
+      "sector": 3,
+      "label": "Z7 · S del Bosque",
+      "hue": 260
+    },
+    {
+      "id": 8,
+      "sector": 3,
+      "label": "Z8 · Última — Curva 12",
+      "hue": 320
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "zone": 1,
+      "sector": 1,
+      "distance_m": 50,
+      "x": 604.38,
+      "y": 388.66,
+      "bearing_deg": -120.5,
+      "side": "outside"
+    },
+    {
+      "id": 2,
+      "zone": 1,
+      "sector": 1,
+      "distance_m": 250,
+      "x": 484.53,
+      "y": 343.8,
+      "bearing_deg": 136.8,
+      "side": "outside"
+    },
+    {
+      "id": 3,
+      "zone": 2,
+      "sector": 1,
+      "distance_m": 430,
+      "x": 403.75,
+      "y": 406.81,
+      "bearing_deg": -168.4,
+      "side": "outside"
+    },
+    {
+      "id": 4,
+      "zone": 2,
+      "sector": 1,
+      "distance_m": 560,
+      "x": 395.67,
+      "y": 330.56,
+      "bearing_deg": -60.2,
+      "side": "outside"
+    },
+    {
+      "id": 5,
+      "zone": 3,
+      "sector": 1,
+      "distance_m": 760,
+      "x": 511.63,
+      "y": 263.35,
+      "bearing_deg": 1.3,
+      "side": "outside"
+    },
+    {
+      "id": 6,
+      "zone": 3,
+      "sector": 1,
+      "distance_m": 900,
+      "x": 604.67,
+      "y": 292.85,
+      "bearing_deg": 10,
+      "side": "outside"
+    },
+    {
+      "id": 7,
+      "zone": 4,
+      "sector": 2,
+      "distance_m": 1100,
+      "x": 661.51,
+      "y": 183.52,
+      "bearing_deg": -82.2,
+      "side": "outside"
+    },
+    {
+      "id": 8,
+      "zone": 4,
+      "sector": 2,
+      "distance_m": 1280,
+      "x": 709.92,
+      "y": 79.06,
+      "bearing_deg": -14,
+      "side": "outside"
+    },
+    {
+      "id": 9,
+      "zone": 5,
+      "sector": 2,
+      "distance_m": 1540,
+      "x": 784.9,
+      "y": 112.39,
+      "bearing_deg": -163.8,
+      "side": "outside"
+    },
+    {
+      "id": 10,
+      "zone": 5,
+      "sector": 2,
+      "distance_m": 1740,
+      "x": 703.69,
+      "y": 163.81,
+      "bearing_deg": 88.1,
+      "side": "outside"
+    },
+    {
+      "id": 11,
+      "zone": 6,
+      "sector": 2,
+      "distance_m": 1950,
+      "x": 725.96,
+      "y": 309.34,
+      "bearing_deg": 76.4,
+      "side": "outside"
+    },
+    {
+      "id": 12,
+      "zone": 6,
+      "sector": 2,
+      "distance_m": 2120,
+      "x": 752.99,
+      "y": 425.96,
+      "bearing_deg": 77.1,
+      "side": "outside"
+    },
+    {
+      "id": 13,
+      "zone": 7,
+      "sector": 3,
+      "distance_m": 2380,
+      "x": 793.97,
+      "y": 604.41,
+      "bearing_deg": 77.1,
+      "side": "outside"
+    },
+    {
+      "id": 14,
+      "zone": 7,
+      "sector": 3,
+      "distance_m": 2560,
+      "x": 818.94,
+      "y": 728.21,
+      "bearing_deg": 103.9,
+      "side": "outside"
+    },
+    {
+      "id": 15,
+      "zone": 8,
+      "sector": 3,
+      "distance_m": 2800,
+      "x": 722.12,
+      "y": 618.21,
+      "bearing_deg": -121.5,
+      "side": "outside"
+    },
+    {
+      "id": 16,
+      "zone": 8,
+      "sector": 3,
+      "distance_m": 3020,
+      "x": 640.02,
+      "y": 486.83,
+      "bearing_deg": -123.3,
+      "side": "outside"
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "label": "F0.0 (rostrum)",
+      "sector": 1,
+      "zone": 1,
+      "distance_m": 20,
+      "x": 612.43,
+      "y": 408.06,
+      "kind": "flag"
+    },
+    {
+      "id": 2,
+      "label": "F1.1",
+      "sector": 1,
+      "zone": 1,
+      "distance_m": 120,
+      "x": 571.06,
+      "y": 353.14,
+      "kind": "flag"
+    },
+    {
+      "id": 3,
+      "label": "F1.2",
+      "sector": 1,
+      "zone": 1,
+      "distance_m": 280,
+      "x": 478.16,
+      "y": 363.74,
+      "kind": "flag"
+    },
+    {
+      "id": 4,
+      "label": "F2.1",
+      "sector": 1,
+      "zone": 2,
+      "distance_m": 430,
+      "x": 403.75,
+      "y": 406.81,
+      "kind": "flag"
+    },
+    {
+      "id": 5,
+      "label": "F2.2",
+      "sector": 1,
+      "zone": 2,
+      "distance_m": 580,
+      "x": 403.34,
+      "y": 318.76,
+      "kind": "flag"
+    },
+    {
+      "id": 6,
+      "label": "F3.1",
+      "sector": 1,
+      "zone": 3,
+      "distance_m": 760,
+      "x": 511.63,
+      "y": 263.35,
+      "kind": "flag"
+    },
+    {
+      "id": 7,
+      "label": "F3.2",
+      "sector": 1,
+      "zone": 3,
+      "distance_m": 920,
+      "x": 618.6,
+      "y": 293.89,
+      "kind": "flag"
+    },
+    {
+      "id": 8,
+      "label": "F4.1",
+      "sector": 2,
+      "zone": 4,
+      "distance_m": 1120,
+      "x": 663.43,
+      "y": 169.56,
+      "kind": "flag"
+    },
+    {
+      "id": 9,
+      "label": "F4.2",
+      "sector": 2,
+      "zone": 4,
+      "distance_m": 1300,
+      "x": 723.59,
+      "y": 75.64,
+      "kind": "flag"
+    },
+    {
+      "id": 10,
+      "label": "F5.1",
+      "sector": 2,
+      "zone": 5,
+      "distance_m": 1520,
+      "x": 798.8,
+      "y": 113.1,
+      "kind": "flag"
+    },
+    {
+      "id": 11,
+      "label": "F5.2",
+      "sector": 2,
+      "zone": 5,
+      "distance_m": 1740,
+      "x": 703.69,
+      "y": 163.81,
+      "kind": "flag"
+    },
+    {
+      "id": 12,
+      "label": "F6.1",
+      "sector": 2,
+      "zone": 6,
+      "distance_m": 1950,
+      "x": 725.96,
+      "y": 309.34,
+      "kind": "flag"
+    },
+    {
+      "id": 13,
+      "label": "F6.2",
+      "sector": 2,
+      "zone": 6,
+      "distance_m": 2140,
+      "x": 756.14,
+      "y": 439.69,
+      "kind": "flag"
+    },
+    {
+      "id": 14,
+      "label": "F7.1",
+      "sector": 3,
+      "zone": 7,
+      "distance_m": 2380,
+      "x": 793.97,
+      "y": 604.41,
+      "kind": "flag"
+    },
+    {
+      "id": 15,
+      "label": "F7.2",
+      "sector": 3,
+      "zone": 7,
+      "distance_m": 2580,
+      "x": 810.68,
+      "y": 738.87,
+      "kind": "flag"
+    },
+    {
+      "id": 16,
+      "label": "F8.1",
+      "sector": 3,
+      "zone": 8,
+      "distance_m": 2800,
+      "x": 722.12,
+      "y": 618.21,
+      "kind": "flag"
+    },
+    {
+      "id": 17,
+      "label": "F8.2",
+      "sector": 3,
+      "zone": 8,
+      "distance_m": 3000,
+      "x": 647.73,
+      "y": 498.61,
+      "kind": "flag"
+    }
+  ],
+  "drivers": [
+    {
+      "number": 112,
+      "code": "URR",
+      "name": "Santiago Urrutia",
+      "team": "Cyan Racing Lynk & Co",
+      "team_color": "#005F9E",
+      "initial_zone": null
+    },
+    {
+      "number": 168,
+      "code": "EHR",
+      "name": "Yann Ehrlacher",
+      "team": "Cyan Racing Lynk & Co",
+      "team_color": "#005F9E",
+      "initial_zone": null
+    },
+    {
+      "number": 155,
+      "code": "MQH",
+      "name": "Ma Qing Hua",
+      "team": "Cyan Racing Lynk & Co",
+      "team_color": "#005F9E",
+      "initial_zone": null
+    },
+    {
+      "number": 111,
+      "code": "BJK",
+      "name": "Thed Björk",
+      "team": "Cyan Racing Lynk & Co",
+      "team_color": "#005F9E",
+      "initial_zone": null
+    },
+    {
+      "number": 129,
+      "code": "GIR",
+      "name": "Néstor Girolami",
+      "team": "BRC Hyundai N Squadra Corse",
+      "team_color": "#002C5F",
+      "initial_zone": null
+    },
+    {
+      "number": 105,
+      "code": "MIC",
+      "name": "Norbert Michelisz",
+      "team": "BRC Hyundai N Squadra Corse",
+      "team_color": "#002C5F",
+      "initial_zone": null
+    },
+    {
+      "number": 196,
+      "code": "AZC",
+      "name": "Mikel Azcona",
+      "team": "BRC Hyundai N Squadra Corse",
+      "team_color": "#002C5F",
+      "initial_zone": null
+    },
+    {
+      "number": 186,
+      "code": "GUE",
+      "name": "Esteban Guerrieri",
+      "team": "GOAT Racing Honda",
+      "team_color": "#CC0000",
+      "initial_zone": null
+    },
+    {
+      "number": 199,
+      "code": "BUT",
+      "name": "Marco Butti",
+      "team": "GOAT Racing Honda",
+      "team_color": "#CC0000",
+      "initial_zone": null
+    },
+    {
+      "number": 62,
+      "code": "BOR",
+      "name": "Dušan Borković",
+      "team": "GOAT Racing Honda",
+      "team_color": "#CC0000",
+      "initial_zone": null
+    },
+    {
+      "number": 127,
+      "code": "FIL",
+      "name": "John Filippi",
+      "team": "Vulcano Motorsport Audi",
+      "team_color": "#BB0A30",
+      "initial_zone": null
+    },
+    {
+      "number": 77,
+      "code": "REI",
+      "name": "Raphael Reis",
+      "team": "W2 Pro GP CUPRA",
+      "team_color": "#E6552F",
+      "initial_zone": null
+    },
+    {
+      "number": 28,
+      "code": "OSM",
+      "name": "Galid Osman",
+      "team": "W2 Pro GP CUPRA",
+      "team_color": "#E6552F",
+      "initial_zone": null
+    },
+    {
+      "number": 37,
+      "code": "RSL",
+      "name": "Guilherme Reischl",
+      "team": "W2 Pro GP CUPRA",
+      "team_color": "#E6552F",
+      "initial_zone": null
+    },
+    {
+      "number": 7,
+      "code": "VIV",
+      "name": "Thiago Vivacqua",
+      "team": "Cobra Racing Toyota",
+      "team_color": "#EB0A1E",
+      "initial_zone": null
+    },
+    {
+      "number": 3,
+      "code": "BAP",
+      "name": "Rodrigo Baptista",
+      "team": "Squadra Martino Honda",
+      "team_color": "#1C1C1C",
+      "initial_zone": null
+    },
+    {
+      "number": 60,
+      "code": "CAS",
+      "name": "Juan Manuel Casella",
+      "team": "Squadra Martino Honda",
+      "team_color": "#1C1C1C",
+      "initial_zone": null
+    },
+    {
+      "number": 34,
+      "code": "CSG",
+      "name": "Fabio Casagrande",
+      "team": "Squadra Martino Honda",
+      "team_color": "#1C1C1C",
+      "initial_zone": null
+    },
+    {
+      "number": 15,
+      "code": "MAG",
+      "name": "Enrique Maglione",
+      "team": "Squadra Martino Honda",
+      "team_color": "#1C1C1C",
+      "initial_zone": null
+    },
+    {
+      "number": 43,
+      "code": "CDR",
+      "name": "Pedro Cardoso",
+      "team": "PMO Racing Peugeot",
+      "team_color": "#1F2A44",
+      "initial_zone": null
+    },
+    {
+      "number": 8,
+      "code": "SUZ",
+      "name": "Rafael Suzuki",
+      "team": "PMO Racing Peugeot",
+      "team_color": "#1F2A44",
+      "initial_zone": null
+    },
+    {
+      "number": 17,
+      "code": "ROS",
+      "name": "Matías Rossi",
+      "team": "Toyota Team Argentina",
+      "team_color": "#FFFFFF",
+      "initial_zone": null
+    },
+    {
+      "number": 16,
+      "code": "RSO",
+      "name": "Juan Ángel Rosso",
+      "team": "Paladini Racing Toyota",
+      "team_color": "#0033A0",
+      "initial_zone": null
+    },
+    {
+      "number": 18,
+      "code": "SLV",
+      "name": "Carlos Silva",
+      "team": "Paladini Racing Toyota",
+      "team_color": "#0033A0",
+      "initial_zone": null
+    },
+    {
+      "number": 47,
+      "code": "FON",
+      "name": "Norberto Fontana",
+      "team": "Squadra Martino Racing",
+      "team_color": "#2C2C2C",
+      "initial_zone": null
+    }
+  ]
+}
