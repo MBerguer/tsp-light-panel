@@ -39,16 +39,10 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
     };
   }
 
-  // Active ring & urgency pulse
+  // Active ring styling
   const activeRing = active
     ? "ring-4 ring-sky-400 scale-[0.98] shadow-2xl"
     : "border border-white/15 hover:scale-[1.02] shadow-md";
-
-  const pulseClass = d.urgent
-    ? "animate-pulse"
-    : d.flashing
-      ? "animate-flag-flash"
-      : "";
 
   return (
     <button
@@ -56,7 +50,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       onClick={onClick}
       disabled={disabled}
       style={customStyle}
-      className={`relative flex flex-col items-center justify-center overflow-hidden rounded-xl p-2.5 sm:p-3 text-center transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed min-h-[64px] sm:min-h-[72px] ${d.bg} ${d.fg} ${activeRing} ${pulseClass}`}
+      className={`relative flex flex-col items-center justify-center overflow-hidden rounded-xl p-2.5 sm:p-3 text-center transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed min-h-[64px] sm:min-h-[72px] ${d.bg} ${d.fg} ${activeRing}`}
     >
       {/* Pattern Overlay / Darkening Pill for text legibility */}
       {d.patternType === "chequered" && (

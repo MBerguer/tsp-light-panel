@@ -312,7 +312,7 @@ function ButtonRow({
     green: "bg-emerald-500 text-emerald-950 ring-emerald-900 hover:bg-emerald-400",
     yellow: "bg-amber-400 text-amber-950 ring-amber-900 hover:bg-amber-300",
     double_yellow:
-      "bg-amber-500 text-slate-950 ring-4 ring-amber-400/90 hover:bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse",
+      "bg-amber-500 text-slate-950 ring-4 ring-amber-400/90 hover:bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]",
     blue: "bg-blue-600 text-white ring-blue-400 hover:bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]",
     white: "bg-slate-100 text-slate-900 ring-slate-300 hover:bg-white",
     dark: "bg-slate-800 text-slate-100 ring-slate-950 hover:bg-slate-700",
