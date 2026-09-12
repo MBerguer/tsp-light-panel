@@ -30,11 +30,14 @@ use futures_util::{SinkExt, StreamExt};
 use tokio::sync::mpsc;
 use tracing::{debug, info, instrument, warn};
 
+use dashmap::DashMap;
+
 use tsp_core::wire::{
-    CircuitCatalogueEntry, ClientMessage, ClientRole, ErrorCode, PanelSummary, ServerMessage, Topic,
+    CircuitCatalogueEntry, ClientMessage, ClientRole, ErrorCode, MarshalPresenceEntry,
+    PanelSummary, ServerMessage, Topic,
 };
 use tsp_core::{
-    CommandSource, CommandTarget, DiagnosticAlert, DomainEvent, FlagState, PanelCommand,
+    CommandSource, CommandTarget, DiagnosticAlert, DomainEvent, FlagState, PanelCommand, PostId,
 };
 
 use crate::World;
@@ -53,16 +56,61 @@ pub struct GatewayState {
     pub scenarios: Arc<crate::ScenarioController>,
     pub server_version: String,
     pub topology_changes: tokio::sync::broadcast::Sender<TopologyChanged>,
+    pub roster: Arc<DashMap<PostId, MarshalPresenceEntry>>,
+    pub roster_changes: tokio::sync::broadcast::Sender<Vec<MarshalPresenceEntry>>,
 }
 
 impl GatewayState {
     pub fn new(world: Arc<World>, scenarios: Arc<crate::ScenarioController>) -> Self {
         let (topology_changes, _) = tokio::sync::broadcast::channel(8);
+        let (roster_changes, _) = tokio::sync::broadcast::channel(16);
         Self {
             world,
             scenarios,
             server_version: env!("CARGO_PKG_VERSION").to_string(),
             topology_changes,
+            roster: Arc::new(DashMap::new()),
+            roster_changes,
+        }
+    }
+
+    pub fn current_roster(&self) -> Vec<MarshalPresenceEntry> {
+        let mut entries: Vec<_> = self.roster.iter().map(|kv| kv.value().clone()).collect();
+        entries.sort_by_key(|e| e.post);
+        entries
+    }
+
+    pub fn update_marshal_presence(&self, post: PostId, name: String, online: bool) {
+        let now = Utc::now();
+        self.roster
+            .entry(post)
+            .and_modify(|e| {
+                if !name.is_empty() {
+                    e.name = name.clone();
+                }
+                e.online = online;
+                e.last_seen = now;
+            })
+            .or_insert_with(|| MarshalPresenceEntry {
+                post,
+                name: if name.is_empty() {
+                    format!("Post #{}", post.raw())
+                } else {
+                    name
+                },
+                online,
+                checked_in_at: now,
+                last_seen: now,
+            });
+        let _ = self.roster_changes.send(self.current_roster());
+    }
+
+    pub fn mark_marshal_offline(&self, post: PostId) {
+        if let Some(mut entry) = self.roster.get_mut(&post) {
+            entry.online = false;
+            entry.last_seen = Utc::now();
+            drop(entry);
+            let _ = self.roster_changes.send(self.current_roster());
         }
     }
 }
@@ -83,6 +131,9 @@ async fn serve_connection(mut socket: WebSocket, state: GatewayState) {
         return;
     };
     info!(role = ?initial_role, "client connected");
+    if let ClientRole::Marshal { post } = initial_role {
+        state.update_marshal_presence(post, "".into(), true);
+    }
 
     let (outbound_tx, mut outbound_rx) = mpsc::channel::<ServerMessage>(64);
     let topics = Arc::new(tokio::sync::RwLock::new(default_topics(initial_role)));
@@ -90,7 +141,7 @@ async fn serve_connection(mut socket: WebSocket, state: GatewayState) {
     // connection (e.g. spectator picking a marshal post in the UI).
     let role = Arc::new(tokio::sync::RwLock::new(initial_role));
 
-    // 2. Send Welcome + initial snapshot.
+    // 2. Send Welcome + initial snapshot + marshal roster.
     send_now(
         &mut socket,
         &ServerMessage::Welcome {
@@ -105,6 +156,13 @@ async fn serve_connection(mut socket: WebSocket, state: GatewayState) {
         &ServerMessage::Snapshot {
             panels: initial_panels,
             cars: initial_cars,
+        },
+    )
+    .await;
+    send_now(
+        &mut socket,
+        &ServerMessage::MarshalRoster {
+            entries: state.current_roster(),
         },
     )
     .await;
@@ -262,8 +320,30 @@ async fn serve_connection(mut socket: WebSocket, state: GatewayState) {
         }
     });
 
+    // Forwarder: roster updates → outbound channel.
+    let mut roster_rx = state.roster_changes.subscribe();
+    let outbound_for_roster = outbound_tx.clone();
+    let roster_task = tokio::spawn(async move {
+        loop {
+            match roster_rx.recv().await {
+                Ok(entries) => {
+                    let msg = ServerMessage::MarshalRoster { entries };
+                    if outbound_for_roster.send(msg).await.is_err() {
+                        return;
+                    }
+                }
+                Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => {}
+                Err(tokio::sync::broadcast::error::RecvError::Closed) => return,
+            }
+        }
+    });
+
     // Hold the connection open until either side ends.
-    let _ = tokio::join!(reader_task, writer_task, bus_task, sim_task, topo_task);
+    let _ = tokio::join!(reader_task, writer_task, bus_task, sim_task, topo_task, roster_task);
+    let final_role = *role.read().await;
+    if let ClientRole::Marshal { post } = final_role {
+        state.mark_marshal_offline(post);
+    }
     info!("client disconnected");
 }
 
@@ -372,9 +452,15 @@ async fn handle_client_message(
 ) {
     match msg {
         ClientMessage::Hello { role: new_role, .. } => {
-            // Allow a connected client to upgrade / downgrade its role
-            // (e.g. spectator → marshal post #5) without tearing down the
-            // socket. Default topics follow the new role.
+            let old_role = *role_cell.read().await;
+            if let ClientRole::Marshal { post: old_post } = old_role {
+                if !matches!(new_role, ClientRole::Marshal { post } if post == old_post) {
+                    state.mark_marshal_offline(old_post);
+                }
+            }
+            if let ClientRole::Marshal { post: new_post } = new_role {
+                state.update_marshal_presence(new_post, "".into(), true);
+            }
             *role_cell.write().await = new_role;
             *topics.write().await = default_topics(new_role);
             debug!(?new_role, "role updated");
@@ -471,6 +557,22 @@ async fn handle_client_message(
             }
             state.scenarios.stop().await;
             state.scenarios.reset_world().await;
+        }
+        ClientMessage::ResetSession => {
+            if !matches!(role, ClientRole::RaceControl { .. }) {
+                let _ = outbound
+                    .send(ServerMessage::Error {
+                        code: ErrorCode::Unauthorized,
+                        message: "only Race Control can reset the session".into(),
+                    })
+                    .await;
+                return;
+            }
+            state.scenarios.stop().await;
+            state.world.reset_session().await;
+        }
+        ClientMessage::MarshalCheckIn { post, name } => {
+            state.update_marshal_presence(post, name, true);
         }
         ClientMessage::ListCircuits => {
             let active = state.world.active_topology().await.name;

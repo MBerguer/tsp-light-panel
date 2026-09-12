@@ -188,3 +188,81 @@ async fn marshal_red_flag_is_rejected_and_logged() {
         "rejection should be in the event store"
     );
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn world_reset_session_clears_all_flags() {
+    let world = World::in_memory();
+    world.bootstrap_circuit(&[(1, 7, 1, 0.0), (2, 8, 1, 50.0)]).await;
+    let marshal = world.spawn_marshal(PostId::new(7));
+    let rc = world.spawn_race_control(OperatorId::new());
+
+    // 1. Marshal sets local yellow on post 7
+    let _ = marshal
+        .submit(tsp_core::PanelCommand::new(
+            CommandSource::Marshal {
+                post: PostId::new(7),
+            },
+            CommandTarget::Zone(ZoneId::new(7)),
+            FlagState::Yellow(YellowKind::Single),
+        ))
+        .await
+        .expect("marshal yellow accepted");
+
+    // 2. RC sets global SC
+    let _ = rc
+        .submit(tsp_core::PanelCommand::new(
+            CommandSource::RaceControl {
+                operator: OperatorId::new(),
+            },
+            CommandTarget::Global,
+            FlagState::SafetyCar,
+        ))
+        .await
+        .expect("rc sc accepted");
+
+    // Verify panel 1 has both override and local state
+    let snap1_before = world.hub.panel_handle(PanelId::new(1)).await.unwrap().snapshot().await;
+    assert_eq!(snap1_before.override_from_rc, Some(FlagState::SafetyCar));
+    assert_eq!(snap1_before.local_state, Some(FlagState::Yellow(YellowKind::Single)));
+
+    // 3. Reset session
+    world.reset_session().await;
+
+    // Verify all panels are completely clear and Off
+    let snap1_after = world.hub.panel_handle(PanelId::new(1)).await.unwrap().snapshot().await;
+    assert_eq!(snap1_after.override_from_rc, None);
+    assert_eq!(snap1_after.local_state, None);
+    assert_eq!(snap1_after.effective_state, FlagState::Off);
+
+    let snap2_after = world.hub.panel_handle(PanelId::new(2)).await.unwrap().snapshot().await;
+    assert_eq!(snap2_after.override_from_rc, None);
+    assert_eq!(snap2_after.local_state, None);
+    assert_eq!(snap2_after.effective_state, FlagState::Off);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn gateway_marshal_roster_tracks_presence() {
+    use std::sync::Arc;
+    let world = Arc::new(World::in_memory());
+    let scenarios = Arc::new(tsp_server::ScenarioController::new(world.clone(), OperatorId::new()));
+    let gw = tsp_server::gateway::GatewayState::new(world, scenarios);
+
+    assert!(gw.current_roster().is_empty());
+
+    gw.update_marshal_presence(PostId::new(3), "Carlos P3".into(), true);
+    gw.update_marshal_presence(PostId::new(7), "Pedro P7".into(), true);
+
+    let roster = gw.current_roster();
+    assert_eq!(roster.len(), 2);
+    let p3 = roster.iter().find(|e| e.post == PostId::new(3)).unwrap();
+    assert_eq!(p3.name, "Carlos P3");
+    assert!(p3.online);
+
+    gw.mark_marshal_offline(PostId::new(3));
+    let roster_after = gw.current_roster();
+    let p3_after = roster_after.iter().find(|e| e.post == PostId::new(3)).unwrap();
+    assert!(!p3_after.online);
+    let p7_after = roster_after.iter().find(|e| e.post == PostId::new(7)).unwrap();
+    assert!(p7_after.online);
+}
+

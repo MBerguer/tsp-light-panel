@@ -29,3 +29,14 @@
     @apply rounded-2xl bg-slate-900/60 border border-white/5 backdrop-blur p-4;
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+

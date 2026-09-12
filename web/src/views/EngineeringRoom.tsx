@@ -15,14 +15,14 @@ export function EngineeringRoomView() {
   const alerts = useStore((s) => s.alerts);
 
   return (
-    <div className="grid h-full grid-cols-12 gap-4">
-      <div className="col-span-8 card flex flex-col gap-3 overflow-hidden">
-        <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="col-span-1 lg:col-span-8 card flex flex-col gap-3 overflow-hidden">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-slate-400">
           Panel health
         </h3>
-        <div className="overflow-y-auto">
-          <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-slate-900/80 text-xs uppercase text-slate-400">
+        <div className="overflow-x-auto overflow-y-auto">
+          <table className="w-full min-w-[500px] text-xs sm:text-sm">
+            <thead className="sticky top-0 bg-slate-900/90 text-[11px] uppercase text-slate-400">
               <tr>
                 <th className="px-2 py-2 text-left">#</th>
                 <th className="px-2 py-2 text-left">Zone</th>
@@ -88,8 +88,8 @@ export function EngineeringRoomView() {
         </div>
       </div>
 
-      <aside className="col-span-4 card flex flex-col gap-3 overflow-hidden">
-        <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+      <aside className="col-span-1 lg:col-span-4 card flex flex-col gap-3 min-h-[250px] lg:min-h-0 overflow-hidden">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-slate-400">
           Alerts ({alerts.length})
         </h3>
         <div className="flex-1 space-y-2 overflow-y-auto pr-1">

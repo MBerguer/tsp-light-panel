@@ -45,6 +45,18 @@ impl ClientRole {
     }
 }
 
+/// Marshal presence entry for online tracking and roster board.
+#[cfg_attr(feature = "ts-rs", derive(TS), ts(export, export_to = "../../../web/src/types/MarshalPresenceEntry.ts"))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MarshalPresenceEntry {
+    pub post: PostId,
+    pub name: String,
+    pub online: bool,
+    pub checked_in_at: DateTime<Utc>,
+    pub last_seen: DateTime<Utc>,
+}
+
+
 /// Messages a client can send to the server.
 #[cfg_attr(feature = "ts-rs", derive(TS), ts(export, export_to = "../../../web/src/types/ClientMessage.ts"))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -75,10 +87,14 @@ pub enum ClientMessage {
     ResetWorld,
     /// Ask the server to list the names+descriptions in the built-in library.
     ListScenarios,
+    /// Ask the server to list all available circuits.
+    ListCircuits,
     /// Switch the active circuit. Race-Control-role only.
     SwitchCircuit { circuit_id: String },
-    /// Ask the server to list available circuit ids + labels.
-    ListCircuits,
+    /// Explicit check-in from a marshal station confirming they are present.
+    MarshalCheckIn { post: PostId, name: String },
+    /// Reset session: clear all flags, overrides and alerts across the circuit (RC-only).
+    ResetSession,
     /// Lightweight liveness probe.
     Ping { nonce: u32 },
 }
@@ -99,6 +115,8 @@ pub enum ServerMessage {
     },
     /// Initial / on-demand snapshot of the world.
     Snapshot { panels: Vec<Panel>, cars: Vec<Car> },
+    /// Active marshal roster across all posts.
+    MarshalRoster { entries: Vec<MarshalPresenceEntry> },
     /// A domain event happened.
     Event { event: DomainEvent },
     /// A diagnostic finding. Duplicates the corresponding `DomainEvent` but is

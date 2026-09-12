@@ -12,7 +12,7 @@ use chrono::Utc;
 use tokio::sync::{broadcast, mpsc, RwLock};
 use tracing::{debug, info, instrument};
 
-use tsp_core::{CarNumber, DomainEvent, EventId, FlagState, PanelId, ZoneId};
+use tsp_core::{CarNumber, DomainEvent, EventId, PanelId, ZoneId};
 use tsp_eventstore::EventStore;
 
 use crate::bus::EventBus;

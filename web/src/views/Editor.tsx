@@ -93,8 +93,8 @@ export function EditorView() {
   };
 
   return (
-    <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[24rem_1fr]">
-      <aside className="card flex h-full flex-col overflow-hidden">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[24rem_1fr]">
+      <aside className="card flex flex-col min-h-[350px] lg:h-full overflow-hidden">
         <header className="space-y-2">
           <label className="block text-xs uppercase text-slate-400">Name</label>
           <input
@@ -111,7 +111,7 @@ export function EditorView() {
             className="w-full rounded bg-slate-800 px-2 py-1 text-sm text-slate-100"
           />
         </header>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-1.5 sm:gap-2">
           <PaletteButton onClick={() => addStep("wait")}>+ Wait</PaletteButton>
           <PaletteButton onClick={() => addStep("mark")}>+ Mark</PaletteButton>
           <PaletteButton onClick={() => addStep("race_control_command")}>
@@ -147,7 +147,7 @@ export function EditorView() {
               <select
                 value={speed}
                 onChange={(e) => setSpeed(Number(e.target.value))}
-                className="rounded bg-slate-800 px-2 py-1 text-slate-200"
+                className="rounded bg-slate-800 px-2 py-1 text-slate-200 text-xs"
               >
                 {[1, 2, 4, 8, 16].map((v) => (
                   <option key={v} value={v}>
@@ -160,21 +160,23 @@ export function EditorView() {
           </div>
           <div className="flex gap-2">
             <button
-              className="btn flex-1"
+              className="btn flex-1 text-xs sm:text-sm"
               onClick={runInline}
               disabled={running || steps.length === 0}
             >
               {running ? "Sending..." : "Run inline"}
             </button>
-            <button className="btn flex-1" onClick={downloadJson}>
+            <button className="btn flex-1 text-xs sm:text-sm" onClick={downloadJson}>
               Download JSON
             </button>
           </div>
           {error && <p className="text-xs text-red-400">{error}</p>}
         </footer>
       </aside>
-      <div className="grid h-full grid-rows-[1fr_auto] gap-4">
-        <TrackMap />
+      <div className="flex flex-col gap-4">
+        <div className="h-64 sm:h-80 md:h-96 lg:h-[450px]">
+          <TrackMap />
+        </div>
         <pre className="card max-h-64 overflow-auto text-[10px] text-slate-400">
           {JSON.stringify(serialiseScenario(scenario), null, 2)}
         </pre>

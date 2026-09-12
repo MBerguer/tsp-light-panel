@@ -81,28 +81,29 @@ export function ReplayView() {
   const carsArray = Object.values(derived.cars);
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 gap-4 lg:grid-cols-[1fr_22rem]">
-      <div className="flex h-full min-h-0 flex-col gap-3">
-        <div className="card flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_22rem]">
+      <div className="flex flex-col gap-3">
+        <div className="card flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <button
-              className="btn"
+              className="btn text-xs px-3 py-1.5 sm:text-sm sm:px-4 sm:py-2"
               onClick={() => setPlaying((p) => !p)}
               disabled={events.length === 0}
             >
               {playing ? "Pause" : "Play"}
             </button>
             <button
-              className="btn"
+              className="btn text-xs px-2.5 py-1.5 sm:text-sm sm:px-3 sm:py-2"
               onClick={() => {
                 setPlaying(false);
                 setCursorMs(0);
               }}
+              title="Start"
             >
               ⏮
             </button>
             <button
-              className="btn"
+              className="btn text-xs px-2.5 py-1.5 sm:text-sm sm:px-3 sm:py-2"
               onClick={() => {
                 setPlaying(false);
                 setCursorMs((c) => Math.max(0, c - 2000));
@@ -111,7 +112,7 @@ export function ReplayView() {
               −2s
             </button>
             <button
-              className="btn"
+              className="btn text-xs px-2.5 py-1.5 sm:text-sm sm:px-3 sm:py-2"
               onClick={() => {
                 setPlaying(false);
                 setCursorMs((c) => Math.min(durationMs, c + 2000));
@@ -119,14 +120,14 @@ export function ReplayView() {
             >
               +2s
             </button>
-            <button className="btn" onClick={fetchEvents}>
-              {loading ? "Loading..." : "Reload"}
+            <button className="btn text-xs px-3 py-1.5 sm:text-sm sm:px-4 sm:py-2" onClick={fetchEvents}>
+              {loading ? "..." : "Reload"}
             </button>
           </div>
           <label className="flex items-center gap-2 text-xs text-slate-400">
             Speed
             <select
-              className="rounded bg-slate-800 px-2 py-1 text-slate-200"
+              className="rounded bg-slate-800 px-2 py-1 text-slate-200 text-xs sm:text-sm"
               value={speed}
               onChange={(e) => setSpeed(Number(e.target.value))}
             >
@@ -152,23 +153,23 @@ export function ReplayView() {
             className="w-full"
             disabled={durationMs === 0}
           />
-          <div className="mt-1 flex justify-between text-[10px] text-slate-500">
+          <div className="mt-1 flex justify-between text-[10px] text-slate-500 font-mono">
             <span>{startTs ? new Date(startTs).toLocaleTimeString() : "—"}</span>
-            <span>
+            <span className="text-sky-400 font-bold">
               T+{(cursorMs / 1000).toFixed(2)}s / {(durationMs / 1000).toFixed(2)}s
             </span>
             <span>{endTs ? new Date(endTs).toLocaleTimeString() : "—"}</span>
           </div>
         </div>
-        <div className="min-h-0 flex-1">
+        <div className="h-64 sm:h-80 md:h-96 lg:h-[450px]">
           <TrackMap
             panelOverrides={derived.panels}
             carsOverride={carsArray}
           />
         </div>
       </div>
-      <aside className="card flex h-full min-h-0 flex-col overflow-hidden">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-300">
+      <aside className="card flex flex-col min-h-[250px] lg:min-h-0 lg:h-full overflow-hidden">
+        <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-300">
           Replay log
         </h2>
         {error && (

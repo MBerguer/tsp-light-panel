@@ -223,4 +223,30 @@ impl World {
     pub async fn diagnostic_supervisor(&self) -> Option<Arc<DiagnosticSupervisor>> {
         self.diagnostic.read().await.clone()
     }
+
+    /// Reset all flags across the circuit: clear global RC override and any local marshal flags.
+    pub async fn reset_session(&self) {
+        let rc_operator = tsp_core::OperatorId::new();
+        let _ = self.hub.handle().dispatch(tsp_core::PanelCommand {
+            id: tsp_core::CommandId::new(),
+            source: tsp_core::CommandSource::RaceControl { operator: rc_operator },
+            target: tsp_core::CommandTarget::Global,
+            flag: tsp_core::FlagState::Off,
+            timestamp: chrono::Utc::now(),
+        }).await;
+
+        for handle in self.hub.all_handles().await {
+            let snap = handle.snapshot().await;
+            if snap.local_state.is_some() {
+                let _ = handle.apply(tsp_core::PanelCommand {
+                    id: tsp_core::CommandId::new(),
+                    source: tsp_core::CommandSource::Marshal { post: tsp_core::PostId::new(snap.zone.raw()) },
+                    target: tsp_core::CommandTarget::Zone(snap.zone),
+                    flag: tsp_core::FlagState::Off,
+                    timestamp: chrono::Utc::now(),
+                }).await;
+            }
+        }
+    }
 }
+

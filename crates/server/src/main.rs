@@ -39,6 +39,7 @@ use tsp_server::{
 struct AppState {
     gateway: GatewayState,
     scenarios: Arc<ScenarioController>,
+    mode: String,
 }
 
 impl FromRef<AppState> for GatewayState {
@@ -63,10 +64,19 @@ async fn main() -> Result<()> {
         circuits::register_disk_dir(circuits_dir);
     }
 
-    let initial_circuit = std::env::var("TSP_CIRCUIT").unwrap_or_else(|_| "demo_oval".into());
+    let initial_circuit = std::env::var("TSP_CIRCUIT").unwrap_or_else(|_| "el_pinar_n13".into());
     let topology = circuits::find(&initial_circuit).unwrap_or_else(CircuitTopology::demo);
     let world = Arc::new(World::in_memory());
     world.bootstrap_from_topology(&topology).await;
+
+    let mode = std::env::var("TSP_MODE").unwrap_or_else(|_| {
+        if initial_circuit.contains("el_pinar") {
+            "track".into()
+        } else {
+            "demo".into()
+        }
+    });
+    info!(%mode, circuit = %initial_circuit, "launching server");
 
     let system_rc_operator = OperatorId::new();
     let _ = world.spawn_race_control(system_rc_operator);
@@ -84,6 +94,7 @@ async fn main() -> Result<()> {
     let state = AppState {
         gateway: gateway.clone(),
         scenarios: scenarios.clone(),
+        mode,
     };
 
     let cors = CorsLayer::new()
@@ -93,6 +104,8 @@ async fn main() -> Result<()> {
 
     let api = Router::new()
         .route("/health", get(health))
+        .route("/api/config", get(get_config))
+        .route("/api/auth/login", axum::routing::post(post_login))
         .route("/api/topology", get(get_topology))
         .route("/api/snapshot", get(get_snapshot))
         .route("/api/sim/library", get(get_library))
@@ -122,9 +135,10 @@ async fn main() -> Result<()> {
         api
     };
 
-    let addr = std::env::var("TSP_BIND")
-        .unwrap_or_else(|_| "127.0.0.1:7878".into())
-        .parse::<SocketAddr>()?;
+    let addr_str = std::env::var("TSP_BIND").ok().or_else(|| {
+        std::env::var("PORT").ok().map(|p| format!("0.0.0.0:{p}"))
+    }).unwrap_or_else(|| "0.0.0.0:7878".into());
+    let addr = addr_str.parse::<SocketAddr>()?;
     info!(%addr, "listening");
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
@@ -134,6 +148,103 @@ async fn main() -> Result<()> {
 async fn health() -> (StatusCode, &'static str) {
     (StatusCode::OK, "ok")
 }
+
+#[derive(serde::Serialize)]
+struct ConfigResponse {
+    mode: String,
+    circuit: String,
+    auth_required: bool,
+}
+
+async fn get_config(State(state): State<AppState>) -> Json<ConfigResponse> {
+    let topo = state.gateway.world.active_topology().await;
+    Json(ConfigResponse {
+        mode: state.mode.clone(),
+        circuit: topo.name.clone(),
+        auth_required: state.mode == "track",
+    })
+}
+
+#[derive(serde::Deserialize)]
+#[serde(tag = "role", rename_all = "snake_case")]
+enum LoginRequest {
+    RaceControl {
+        password: String,
+    },
+    Marshal {
+        post: u32,
+        name: String,
+        pin: String,
+    },
+}
+
+async fn post_login(
+    State(state): State<AppState>,
+    Json(body): Json<LoginRequest>,
+) -> (StatusCode, Json<serde_json::Value>) {
+    match body {
+        LoginRequest::RaceControl { password } => {
+            let expected = std::env::var("TSP_RC_PASSWORD").unwrap_or_else(|_| "control123".into());
+            if password == expected {
+                let op = tsp_core::OperatorId::new();
+                (
+                    StatusCode::OK,
+                    Json(serde_json::json!({
+                        "ok": true,
+                        "role": {
+                            "role": "race_control",
+                            "data": { "operator": op.to_string() }
+                        },
+                        "name": "Director de Carrera"
+                    })),
+                )
+            } else {
+                (
+                    StatusCode::UNAUTHORIZED,
+                    Json(serde_json::json!({
+                        "ok": false,
+                        "error": "Contraseña de Race Control incorrecta"
+                    })),
+                )
+            }
+        }
+        LoginRequest::Marshal { post, name, pin } => {
+            let expected = std::env::var("TSP_MARSHAL_PIN").unwrap_or_else(|_| "1234".into());
+            if pin == expected {
+                let clean_name = if name.trim().is_empty() {
+                    format!("Comisario Puesto #{post}")
+                } else {
+                    name.trim().to_string()
+                };
+                state.gateway.update_marshal_presence(
+                    tsp_core::PostId::new(post),
+                    clean_name.clone(),
+                    true,
+                );
+                (
+                    StatusCode::OK,
+                    Json(serde_json::json!({
+                        "ok": true,
+                        "role": {
+                            "role": "marshal",
+                            "data": { "post": post }
+                        },
+                        "name": clean_name
+                    })),
+                )
+            } else {
+                (
+                    StatusCode::UNAUTHORIZED,
+                    Json(serde_json::json!({
+                        "ok": false,
+                        "error": "PIN de Comisario incorrecto"
+                    })),
+                )
+            }
+        }
+    }
+}
+
 
 async fn get_topology(State(state): State<AppState>) -> Json<CircuitTopology> {
     Json(state.gateway.world.active_topology().await)

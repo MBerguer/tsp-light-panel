@@ -47,9 +47,9 @@ export function ScenarioPlayerView() {
   }
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-12 gap-4">
-      <div className="col-span-9 flex min-h-0 flex-col gap-4">
-        <div className="min-h-0 flex-1">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="col-span-1 lg:col-span-8 xl:col-span-9 flex flex-col gap-4">
+        <div className="h-64 sm:h-80 md:h-96 lg:h-[420px]">
           <TrackMap />
         </div>
         <ControlBar
@@ -69,7 +69,7 @@ export function ScenarioPlayerView() {
           </div>
         )}
       </div>
-      <aside className="col-span-3 h-full min-h-0 overflow-hidden">
+      <aside className="col-span-1 lg:col-span-4 xl:col-span-3 min-h-[280px] lg:min-h-0 lg:h-full overflow-hidden">
         <EventFeed />
       </aside>
     </div>
@@ -100,13 +100,13 @@ function ControlBar({
   const meta = scenarios.find((s) => s.name === selected);
   return (
     <div className="card">
-      <div className="grid grid-cols-12 items-center gap-3">
-        <div className="col-span-5">
+      <div className="flex flex-col sm:grid sm:grid-cols-12 items-stretch sm:items-center gap-3">
+        <div className="sm:col-span-6 lg:col-span-5">
           <label className="block text-[10px] uppercase tracking-widest text-slate-400">
             Scenario
           </label>
           <select
-            className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900/80 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900/80 px-3 py-2 text-xs sm:text-sm"
             value={selected}
             onChange={(e) => onSelect(e.target.value)}
             disabled={isRunning}
@@ -118,48 +118,54 @@ function ControlBar({
             ))}
           </select>
           {meta?.description && (
-            <p className="mt-1 text-xs text-slate-400">{meta.description}</p>
+            <p className="mt-1 text-[11px] sm:text-xs text-slate-400 truncate sm:whitespace-normal">
+              {meta.description}
+            </p>
           )}
         </div>
-        <div className="col-span-2">
-          <label className="block text-[10px] uppercase tracking-widest text-slate-400">
-            Speed
-          </label>
-          <select
-            className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900/80 px-3 py-2 text-sm"
-            value={speed}
-            onChange={(e) => onSpeed(Number(e.target.value))}
-            disabled={isRunning}
-          >
-            {[0.5, 1, 2, 5, 10].map((s) => (
-              <option key={s} value={s}>
-                {s}x
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="col-span-5 flex justify-end gap-2">
-          {!isRunning && (
-            <button className="btn" onClick={onReset}>
-              Reset world
-            </button>
-          )}
-          {isRunning ? (
-            <button
-              className="btn border-red-400 bg-red-500/20 text-red-200"
-              onClick={onStop}
+
+        <div className="flex items-center justify-between gap-3 sm:contents">
+          <div className="w-24 sm:w-auto sm:col-span-2">
+            <label className="block text-[10px] uppercase tracking-widest text-slate-400">
+              Speed
+            </label>
+            <select
+              className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900/80 px-2.5 py-2 text-xs sm:text-sm"
+              value={speed}
+              onChange={(e) => onSpeed(Number(e.target.value))}
+              disabled={isRunning}
             >
-              Stop
-            </button>
-          ) : (
-            <button
-              className="btn border-emerald-400 bg-emerald-500/20 text-emerald-200"
-              onClick={onPlay}
-              disabled={!selected}
-            >
-              Play
-            </button>
-          )}
+              {[0.5, 1, 2, 5, 10].map((s) => (
+                <option key={s} value={s}>
+                  {s}x
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1 sm:col-span-4 lg:col-span-5 flex justify-end gap-2 pt-4 sm:pt-0">
+            {!isRunning && (
+              <button className="btn text-xs sm:text-sm flex-1 sm:flex-none" onClick={onReset}>
+                Reset
+              </button>
+            )}
+            {isRunning ? (
+              <button
+                className="btn border-red-400 bg-red-500/20 text-red-200 text-xs sm:text-sm flex-1 sm:flex-none"
+                onClick={onStop}
+              >
+                Stop
+              </button>
+            ) : (
+              <button
+                className="btn border-emerald-400 bg-emerald-500/20 text-emerald-200 text-xs sm:text-sm flex-1 sm:flex-none"
+                onClick={onPlay}
+                disabled={!selected}
+              >
+                Play
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

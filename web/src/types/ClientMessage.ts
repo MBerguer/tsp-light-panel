@@ -11,4 +11,4 @@ export type ClientMessage = { "type": "hello", role: ClientRole, client_version:
 /**
  * Scale factor on wait durations. 1.0 = real time, 5.0 = 5x faster.
  */
-speed: number, } | { "type": "stop_scenario" } | { "type": "reset_world" } | { "type": "list_scenarios" } | { "type": "switch_circuit", circuit_id: string, } | { "type": "list_circuits" } | { "type": "ping", nonce: number, };
+speed: number, } | { "type": "stop_scenario" } | { "type": "reset_world" } | { "type": "list_scenarios" } | { "type": "switch_circuit", circuit_id: string, } | { "type": "list_circuits" } | { "type": "marshal_check_in", post: number, name: string, } | { "type": "reset_session" } | { "type": "ping", nonce: number, };

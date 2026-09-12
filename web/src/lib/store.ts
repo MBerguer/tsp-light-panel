@@ -8,10 +8,12 @@ import type { Panel } from "@/types/Panel";
 import type { ScenarioCatalogueEntry } from "@/types/ScenarioCatalogueEntry";
 import type { ScenarioFinishReason } from "@/types/ScenarioFinishReason";
 import type { ServerMessage } from "@/types/ServerMessage";
+import type { MarshalPresenceEntry } from "@/types/MarshalPresenceEntry";
 import type { CarNumber, PanelId, ZoneId } from "@/types/ids";
 import type { FlagState } from "@/types/FlagState";
 import type { CircuitTopology } from "./topology";
 import { type ConnectionStatus, WsClient, buildDefaultUrl } from "./ws";
+import { safeRandomUUID, safeStorageGet, safeStorageSet } from "./uuid";
 
 interface ScenarioProgress {
   step_idx: number;
@@ -64,6 +66,13 @@ interface AppState {
   ecuLights: Record<number, EcuLight>;
   client: WsClient | null;
 
+  mode: "track" | "demo";
+  authRequired: boolean;
+  authenticated: boolean;
+  userName: string | null;
+  marshalPost: number | null;
+  marshalRoster: MarshalPresenceEntry[];
+
   scenarios: ScenarioCatalogueEntry[];
   scenarioRun: ScenarioRun | null;
 
@@ -72,6 +81,16 @@ interface AppState {
 
   init(): Promise<void>;
   setRole(role: ClientRole): void;
+  login(params: {
+    role: "race_control" | "marshal";
+    name?: string;
+    post?: number;
+    pin?: string;
+    password?: string;
+  }): Promise<{ ok: boolean; error?: string }>;
+  logout(): void;
+  checkInMarshal(): void;
+  resetSession(): void;
   handleMessage(msg: ServerMessage): void;
   startScenario(name: string, speed?: number): void;
   stopScenario(): void;
@@ -82,15 +101,16 @@ interface AppState {
   refreshTopology(): Promise<void>;
 }
 
+
 function defaultRole(): ClientRole {
   return { role: "race_control", data: { operator: anonymousOperatorId() } };
 }
 
 function anonymousOperatorId(): string {
-  const existing = sessionStorage.getItem("tsp_operator_id");
+  const existing = safeStorageGet("tsp_operator_id");
   if (existing) return existing;
-  const id = crypto.randomUUID();
-  sessionStorage.setItem("tsp_operator_id", id);
+  const id = safeRandomUUID();
+  safeStorageSet("tsp_operator_id", id);
   return id;
 }
 
@@ -98,10 +118,14 @@ export const useStore = create<AppState>((set, get) => {
   const applyEvent = (event: DomainEvent): void => {
     const at = new Date().toISOString();
     const id =
-      "id" in event ? (event as { id: string }).id : crypto.randomUUID();
-    set((s) => ({
-      events: [{ id, event, at }, ...s.events].slice(0, 500),
-    }));
+      "id" in event ? (event as { id: string }).id : safeRandomUUID();
+    // Only log operational/flag/diagnostic events in Race Control event log.
+    // High-frequency telemetry (car_moved) updates car positions directly without cluttering the log.
+    if (event.type !== "car_moved") {
+      set((s) => ({
+        events: [{ id, event, at }, ...s.events].slice(0, 500),
+      }));
+    }
     switch (event.type) {
       case "panel_state_changed": {
         const panels = { ...get().panels };
@@ -198,6 +222,14 @@ export const useStore = create<AppState>((set, get) => {
     activeAlerts: {},
     ecuLights: {},
     client: null,
+
+    mode: "track",
+    authRequired: true,
+    authenticated: false,
+    userName: null,
+    marshalPost: null,
+    marshalRoster: [],
+
     scenarios: [],
     scenarioRun: null,
     circuits: [],
@@ -205,15 +237,139 @@ export const useStore = create<AppState>((set, get) => {
 
     async init() {
       if (get().client) return;
+
+      // Restore session if exists
+      let initialRole = defaultRole();
+      const savedSessionStr = safeStorageGet("tsp_auth_session");
+      if (savedSessionStr) {
+        try {
+          const session = JSON.parse(savedSessionStr);
+          if (session && session.role) {
+            set({
+              authenticated: true,
+              userName: session.name || null,
+              marshalPost: session.post || null,
+            });
+            if (session.role.role === "marshal" || session.role.role === "race_control") {
+              initialRole = session.role;
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // Fetch server config
+      try {
+        const cfg: { mode: "track" | "demo"; circuit: string; auth_required: boolean } =
+          await fetch("/api/config").then((r) => r.json());
+        set({
+          mode: cfg.mode,
+          authRequired: cfg.auth_required,
+          ...(!cfg.auth_required ? { authenticated: true } : {}),
+        });
+      } catch (e) {
+        console.warn("Failed to fetch /api/config", e);
+      }
+
       const topology: CircuitTopology = await fetch("/api/topology").then((r) =>
         r.json()
       );
-      const client = new WsClient(buildDefaultUrl(), get().role);
+      const client = new WsClient(buildDefaultUrl(), initialRole);
       client.onStatus((status) => set({ status }));
       client.onMessage((msg) => get().handleMessage(msg));
       client.connect();
-      set({ topology, client, activeCircuitId: topology.name });
+      set({ topology, client, role: initialRole, activeCircuitId: topology.name });
+
+      // If restored as marshal, send check-in once connected
+      if (get().authenticated && get().marshalPost && get().userName) {
+        setTimeout(() => {
+          get().checkInMarshal();
+        }, 500);
+      }
+
       await Promise.all([get().loadScenarios(), get().loadCircuits()]);
+    },
+
+    async login(params) {
+      try {
+        const body =
+          params.role === "race_control"
+            ? { role: "race_control", password: params.password ?? "" }
+            : {
+                role: "marshal",
+                post: Number(params.post),
+                name: params.name ?? "",
+                pin: params.pin ?? "",
+              };
+
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          return { ok: false, error: data.error || "Error al autenticar" };
+        }
+
+        const newRole: ClientRole = data.role;
+        const userName: string = data.name;
+        const marshalPost = params.role === "marshal" ? Number(params.post) : null;
+
+        safeStorageSet(
+          "tsp_auth_session",
+          JSON.stringify({ role: newRole, name: userName, post: marshalPost })
+        );
+
+        set({
+          authenticated: true,
+          userName,
+          marshalPost,
+          role: newRole,
+        });
+
+        get().client?.setRole(newRole);
+
+        if (marshalPost && userName) {
+          get().client?.send({
+            type: "marshal_check_in",
+            post: marshalPost,
+            name: userName,
+          });
+        }
+
+        return { ok: true };
+      } catch (e: any) {
+        return { ok: false, error: e?.message || "Error de conexión" };
+      }
+    },
+
+    logout() {
+      safeStorageSet("tsp_auth_session", "");
+      const defRole = defaultRole();
+      set({
+        authenticated: false,
+        userName: null,
+        marshalPost: null,
+        role: defRole,
+      });
+      get().client?.setRole(defRole);
+    },
+
+    checkInMarshal() {
+      const { marshalPost, userName } = get();
+      if (marshalPost && userName) {
+        get().client?.send({
+          type: "marshal_check_in",
+          post: marshalPost,
+          name: userName,
+        });
+      }
+    },
+
+    resetSession() {
+      get().client?.send({ type: "reset_session" });
     },
 
     async loadScenarios() {
@@ -285,6 +441,10 @@ export const useStore = create<AppState>((set, get) => {
           const carsIndexed: Record<number, Car> = {};
           for (const c of msg.cars) carsIndexed[c.number as number] = c;
           set({ panels: indexed, cars: carsIndexed });
+          break;
+        }
+        case "marshal_roster": {
+          set({ marshalRoster: msg.entries });
           break;
         }
         case "event":

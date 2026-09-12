@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { describeFlag } from "@/lib/flag";
 import type { DomainEvent } from "@/types/DomainEvent";
@@ -7,20 +8,21 @@ import type { DomainEvent } from "@/types/DomainEvent";
  * a compact card with a colour-coded badge.
  */
 export function EventFeed({ limit = 40 }: { limit?: number }) {
-  const events = useStore((s) => s.events.slice(0, limit));
+  const events = useStore((s) => s.events);
+  const visibleEvents = useMemo(() => events.slice(0, limit), [events, limit]);
   return (
     <div className="card flex h-full flex-col gap-2 overflow-hidden">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-widest text-slate-400">
           Event log
         </h3>
-        <span className="text-xs text-slate-500">{events.length} shown</span>
+        <span className="text-xs text-slate-500">{visibleEvents.length} shown</span>
       </div>
       <div className="-mr-2 flex-1 space-y-1 overflow-y-auto pr-2">
-        {events.length === 0 && (
+        {visibleEvents.length === 0 && (
           <div className="text-xs text-slate-500">No events yet.</div>
         )}
-        {events.map((e) => (
+        {visibleEvents.map((e) => (
           <Row key={e.id} event={e.event} at={e.at} />
         ))}
       </div>

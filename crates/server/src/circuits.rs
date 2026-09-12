@@ -347,4 +347,21 @@ mod tests {
             assert!(topology.track_length_m > 0.0);
         }
     }
+
+    #[test]
+    fn el_pinar_n13_disk_topology_is_valid() {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("circuits/el_pinar_n13.json");
+        if !path.exists() {
+            return;
+        }
+        let bytes = std::fs::read(&path).expect("read el_pinar_n13.json");
+        let topology: CircuitTopology =
+            serde_json::from_slice(&bytes).expect("deserialize el_pinar_n13.json");
+        assert_eq!(topology.name, "el_pinar_n13");
+        assert_eq!(topology.track_length_m, 4000.0);
+        assert_eq!(topology.zones.len(), 16);
+        assert_eq!(topology.panels.len(), 16);
+        assert_eq!(topology.posts.len(), 16);
+        assert!(!topology.racing_line.is_empty());
+    }
 }
