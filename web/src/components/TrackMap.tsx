@@ -265,7 +265,57 @@ export function TrackMap({
     };
 
     return { sectorGeometries: geometries, startFinish: sf };
-  }, [topology]);
+  }, [topology, sampler]);
+
+  // Global procedure detector & sector hazard counters
+  const globalIndicators = useMemo(() => {
+    let sc = false;
+    let vsc = false;
+    let vscEnding = false;
+    let red = false;
+    let chequered = false;
+    let fcy = false;
+    let code60 = false;
+    let rain = false;
+    let doubleYellowCount = 0;
+    let singleYellowCount = 0;
+    let slipperyCount = 0;
+
+    const allPanels = topology?.panels ?? [];
+    for (const p of allPanels) {
+      const live = panels[p.id];
+      const flag =
+        panelOverrides?.[p.id] ??
+        live?.effective_state ??
+        ({ kind: "off" } as FlagState);
+      if (flag.kind === "safety_car") sc = true;
+      if (flag.kind === "virtual_safety_car") vsc = true;
+      if (flag.kind === "vsc_ending") vscEnding = true;
+      if (flag.kind === "red") red = true;
+      if (flag.kind === "chequered") chequered = true;
+      if (flag.kind === "full_course_yellow") fcy = true;
+      if (flag.kind === "code60") code60 = true;
+      if (flag.kind === "rain") rain = true;
+      if (flag.kind === "yellow") {
+        if (flag.data === "double") doubleYellowCount++;
+        else singleYellowCount++;
+      }
+      if (flag.kind === "yellow_red_striped") slipperyCount++;
+    }
+    return {
+      sc,
+      vsc,
+      vscEnding,
+      red,
+      chequered,
+      fcy,
+      code60,
+      rain,
+      doubleYellowCount,
+      singleYellowCount,
+      slipperyCount,
+    };
+  }, [topology?.panels, panels, panelOverrides]);
 
   if (!topology) {
     return (
@@ -278,7 +328,139 @@ export function TrackMap({
   const { width, height } = topology.viewport;
 
   return (
-    <div className="card h-full overflow-hidden">
+    <div className="card relative h-full overflow-hidden flex flex-col p-0 bg-slate-950/80">
+      {/* ========================================================================= */}
+      {/* FIA / F1 RACE CONTROL STATUS HUD OVERLAY                                  */}
+      {/* ========================================================================= */}
+      {globalIndicators.sc && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-amber-400 bg-amber-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-amber-200 shadow-[0_0_25px_rgba(245,158,11,0.6)] backdrop-blur animate-pulse pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg">🚨</span>
+            <span className="rounded bg-amber-400 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
+              SAFETY CAR
+            </span>
+            <span className="hidden sm:inline">DEPLOYED · PROHIBIDO ADELANTAR</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-amber-300">
+            <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+            <span>SC ACTIVE</span>
+          </div>
+        </div>
+      )}
+
+      {globalIndicators.vsc && !globalIndicators.sc && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-amber-400 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-amber-300 shadow-[0_0_25px_rgba(251,191,36,0.5)] backdrop-blur pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg text-amber-400">⚡</span>
+            <span className="rounded border border-amber-400 bg-slate-900 px-2 py-0.5 font-mono font-black text-amber-300 text-xs sm:text-sm">
+              VSC
+            </span>
+            <span className="hidden sm:inline font-bold">VIRTUAL SAFETY CAR · REDUCIR VELOCIDAD</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-amber-400">
+            <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>DELTA TIME</span>
+          </div>
+        </div>
+      )}
+
+      {globalIndicators.vscEnding && !globalIndicators.vsc && !globalIndicators.sc && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-emerald-400 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.5)] backdrop-blur animate-pulse pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg">⚡🟢</span>
+            <span className="rounded bg-emerald-500 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
+              VSC ENDING
+            </span>
+            <span className="hidden sm:inline font-bold">PREPARAR REINICIO · VERDE INMINENTE</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-emerald-300">
+            <span>RESUME SOON</span>
+          </div>
+        </div>
+      )}
+
+      {globalIndicators.red && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-red-500 bg-red-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-red-100 shadow-[0_0_30px_rgba(239,68,68,0.7)] backdrop-blur animate-pulse pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg">🚩</span>
+            <span className="rounded bg-red-600 px-2 py-0.5 font-black text-white text-xs sm:text-sm">
+              RED FLAG
+            </span>
+            <span className="hidden sm:inline">SESIÓN SUSPENDIDA · REGRESAR A PIT LANE</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-red-300">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-ping" />
+            <span>SESSION STOPPED</span>
+          </div>
+        </div>
+      )}
+
+      {globalIndicators.rain && !globalIndicators.red && !globalIndicators.sc && !globalIndicators.vsc && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-sky-400 bg-sky-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-sky-200 shadow-[0_0_25px_rgba(56,189,248,0.5)] backdrop-blur pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg">🌧️</span>
+            <span className="rounded bg-sky-500 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
+              WET TRACK
+            </span>
+            <span className="hidden sm:inline font-bold">PISTA HÚMEDA · CONDICIONES DE LLUVIA</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-sky-300">
+            <span className="inline-block animate-bounce">💧</span>
+            <span className="inline-block animate-bounce delay-100">💧</span>
+            <span>RAIN ACTIVE</span>
+          </div>
+        </div>
+      )}
+
+      {globalIndicators.chequered && !globalIndicators.red && (
+        <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-slate-300 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-white shadow-2xl backdrop-blur pointer-events-none">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
+            <span className="text-base sm:text-lg">🏁</span>
+            <span className="rounded bg-white px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
+              CHEQUERED FLAG
+            </span>
+            <span className="hidden sm:inline">SESIÓN FINALIZADA</span>
+          </div>
+          <span className="font-mono text-xs font-bold text-slate-300">FINISH</span>
+        </div>
+      )}
+
+      {/* Local sector hazard summary if no top-level global alert */}
+      {!globalIndicators.sc &&
+        !globalIndicators.vsc &&
+        !globalIndicators.vscEnding &&
+        !globalIndicators.red &&
+        !globalIndicators.rain &&
+        !globalIndicators.chequered && (
+          <div className="absolute top-2.5 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 text-xs pointer-events-none">
+            <div className="flex items-center gap-2">
+              {globalIndicators.doubleYellowCount > 0 ? (
+                <span className="flex items-center gap-1 rounded-md bg-amber-500/20 border border-amber-500/60 px-2 py-0.5 font-extrabold text-[11px] text-amber-300 backdrop-blur shadow-sm animate-pulse">
+                  <span>⚠️⚠️</span>
+                  <span>{globalIndicators.doubleYellowCount} SECTOR(ES) DOUBLE YELLOW</span>
+                </span>
+              ) : globalIndicators.singleYellowCount > 0 ? (
+                <span className="flex items-center gap-1 rounded-md bg-yellow-500/20 border border-yellow-500/50 px-2 py-0.5 font-bold text-[11px] text-yellow-300 backdrop-blur">
+                  <span>⚠️</span>
+                  <span>{globalIndicators.singleYellowCount} SECTOR(ES) AMARILLO SIMPLE</span>
+                </span>
+              ) : (
+                <div className="flex items-center gap-1.5 rounded-full bg-slate-900/80 border border-white/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 backdrop-blur">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <span>PISTA LIBRE · GREEN TRACK</span>
+                </div>
+              )}
+
+              {globalIndicators.slipperyCount > 0 && (
+                <span className="flex items-center gap-1 rounded-md bg-orange-500/20 border border-orange-500/60 px-2 py-0.5 font-bold text-[11px] text-orange-300 backdrop-blur">
+                  <span>🟡🔴</span>
+                  <span>{globalIndicators.slipperyCount} RESBALADIZO</span>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="h-full w-full"
@@ -289,6 +471,63 @@ export function TrackMap({
             <stop offset="0%" stopColor="#1e293b" />
             <stop offset="100%" stopColor="#0f172a" />
           </linearGradient>
+
+          {/* Double Yellow Hazard Diagonal Stripes */}
+          <pattern
+            id="pattern-double-yellow"
+            width="16"
+            height="16"
+            patternTransform="rotate(45)"
+            patternUnits="userSpaceOnUse"
+          >
+            <rect width="8" height="16" fill="#f59e0b" />
+            <rect x="8" width="8" height="16" fill="#0f172a" />
+          </pattern>
+
+          {/* Rain / Wet Track: Slanted aqua rain droplets & ripples */}
+          <pattern
+            id="pattern-rain"
+            width="20"
+            height="20"
+            patternTransform="rotate(-25)"
+            patternUnits="userSpaceOnUse"
+          >
+            <rect width="20" height="20" fill="#0369a1" />
+            <line x1="3" y1="0" x2="3" y2="9" stroke="#7dd3fc" strokeWidth="1.6" strokeLinecap="round" opacity="0.85" />
+            <line x1="13" y1="8" x2="13" y2="17" stroke="#bae6fd" strokeWidth="1.4" strokeLinecap="round" opacity="0.9" />
+            <circle cx="10" cy="5" r="3" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6" />
+          </pattern>
+
+          {/* Slippery: Alternating yellow and red stripes */}
+          <pattern
+            id="pattern-slippery"
+            width="16"
+            height="16"
+            patternTransform="rotate(90)"
+            patternUnits="userSpaceOnUse"
+          >
+            <rect width="8" height="16" fill="#eab308" />
+            <rect x="8" width="8" height="16" fill="#dc2626" />
+          </pattern>
+
+          {/* Chequered flag texture */}
+          <pattern id="pattern-chequered" width="12" height="12" patternUnits="userSpaceOnUse">
+            <rect width="6" height="6" fill="#f8fafc" />
+            <rect x="6" width="6" height="6" fill="#0f172a" />
+            <rect y="6" width="6" height="6" fill="#0f172a" />
+            <rect x="6" y="6" width="6" height="6" fill="#f8fafc" />
+          </pattern>
+
+          {/* Glow filters */}
+          <filter id="glow-double-yellow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f59e0b" floodOpacity="0.95" />
+          </filter>
+          <filter id="glow-rain" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#38bdf8" floodOpacity="0.95" />
+          </filter>
+          <filter id="glow-sc" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#ff7a00" floodOpacity="0.85" />
+          </filter>
         </defs>
 
         <rect width={width} height={height} fill="url(#track-grad)" />
@@ -311,6 +550,43 @@ export function TrackMap({
           );
         })}
 
+        {/* Global procedure outer circuit glow */}
+        {globalIndicators.sc && (
+          <path
+            d={racingLinePath}
+            fill="none"
+            stroke="#ff7a00"
+            strokeWidth={32}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            className="animate-pulse opacity-60"
+            filter="url(#glow-sc)"
+          />
+        )}
+        {globalIndicators.vsc && (
+          <path
+            d={racingLinePath}
+            fill="none"
+            stroke="#fbbf24"
+            strokeWidth={30}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            className="animate-pulse opacity-50"
+            filter="url(#glow-double-yellow)"
+          />
+        )}
+        {globalIndicators.red && (
+          <path
+            d={racingLinePath}
+            fill="none"
+            stroke="#dc2626"
+            strokeWidth={32}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            className="animate-pulse opacity-70"
+          />
+        )}
+
         {/* Outer track borders / Curbs */}
         <path
           d={racingLinePath}
@@ -331,7 +607,7 @@ export function TrackMap({
           strokeLinecap="round"
         />
 
-        {/* Sector Asphalt Segments: painted directly with active flag colour */}
+        {/* Sector Asphalt Segments: painted with distinct patterns & authentic F1 styles */}
         {sectorGeometries.map(({ panel: p, pathD }) => {
           const live = panels[p.id];
           const flag =
@@ -341,9 +617,147 @@ export function TrackMap({
           const display = describeFlag(flag);
           const isHighlight = highlightPanel === p.id;
           const isOff = flag.kind === "off";
+          const isDoubleYellow = flag.kind === "yellow" && flag.data === "double";
+          const isSingleYellow = flag.kind === "yellow" && flag.data !== "double";
+          const isRain = flag.kind === "rain";
+          const isSlippery = flag.kind === "yellow_red_striped";
+          const isChequered = flag.kind === "chequered";
           const fill = svgFlagColour(flag);
           const pulse = !isOff && display.flashing ? "animate-flag-flash" : "";
 
+          // Double Yellow: Diagonal hazard stripes + energetic flashing amber aura
+          if (isDoubleYellow) {
+            return (
+              <g
+                key={`sector-dy-${p.id}`}
+                className="cursor-pointer"
+                onClick={() => onPanelClick?.(p)}
+              >
+                {/* Amber flashing hazard underglow */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth={26}
+                  strokeLinejoin="round"
+                  strokeLinecap="butt"
+                  className="animate-pulse opacity-85"
+                  filter="url(#glow-double-yellow)"
+                />
+                {/* 45° diagonal hazard stripes road surface */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="url(#pattern-double-yellow)"
+                  strokeWidth={22}
+                  strokeLinejoin="round"
+                  strokeLinecap="butt"
+                />
+                <title>
+                  Sector {p.sector} · Panel #{p.id} · DOUBLE YELLOW (PELIGRO MÁXIMO)
+                </title>
+              </g>
+            );
+          }
+
+          // Single Yellow: Solid caution yellow with gentle caution pulse
+          if (isSingleYellow) {
+            return (
+              <path
+                key={`sector-sy-${p.id}`}
+                d={pathD}
+                fill="none"
+                stroke="#facc15"
+                strokeWidth={isHighlight ? 24 : 22}
+                strokeLinejoin="round"
+                strokeLinecap="butt"
+                className="cursor-pointer transition-colors duration-150 animate-flag-flash"
+                style={{ filter: "drop-shadow(0 0 7px rgba(250, 204, 21, 0.85))" }}
+                onClick={() => onPanelClick?.(p)}
+              >
+                <title>
+                  Sector {p.sector} · Panel #{p.id} · YELLOW (PRECAUCIÓN SIMPLE)
+                </title>
+              </path>
+            );
+          }
+
+          // Rain: Aqua/cyan wet asphalt with slanted rain streaks and ripple rings
+          if (isRain) {
+            return (
+              <g
+                key={`sector-rain-${p.id}`}
+                className="cursor-pointer"
+                onClick={() => onPanelClick?.(p)}
+              >
+                {/* Cyan wet road glow */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="#0284c7"
+                  strokeWidth={26}
+                  strokeLinejoin="round"
+                  strokeLinecap="butt"
+                  className="opacity-80"
+                  filter="url(#glow-rain)"
+                />
+                {/* Rain pattern with slanted drops */}
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="url(#pattern-rain)"
+                  strokeWidth={22}
+                  strokeLinejoin="round"
+                  strokeLinecap="butt"
+                />
+                <title>
+                  Sector {p.sector} · Panel #{p.id} · RAIN (PISTA HÚMEDA · GOTAS)
+                </title>
+              </g>
+            );
+          }
+
+          // Slippery: Vertical yellow and red stripes
+          if (isSlippery) {
+            return (
+              <g
+                key={`sector-slippery-${p.id}`}
+                className="cursor-pointer"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="url(#pattern-slippery)"
+                  strokeWidth={22}
+                  strokeLinejoin="round"
+                  strokeLinecap="butt"
+                />
+                <title>
+                  Sector {p.sector} · Panel #{p.id} · SLIPPERY (ACEITE / AGUA)
+                </title>
+              </g>
+            );
+          }
+
+          // Chequered: Checkered squares texture
+          if (isChequered) {
+            return (
+              <path
+                key={`sector-chq-${p.id}`}
+                d={pathD}
+                fill="none"
+                stroke="url(#pattern-chequered)"
+                strokeWidth={22}
+                strokeLinejoin="round"
+                strokeLinecap="butt"
+                className="cursor-pointer"
+                onClick={() => onPanelClick?.(p)}
+              />
+            );
+          }
+
+          // Other flags: Green, Blue, Red, Off, etc.
           return (
             <path
               key={`sector-asphalt-${p.id}`}
@@ -431,12 +845,220 @@ export function TrackMap({
           const display = describeFlag(flag);
           const isHighlight = highlightPanel === p.id;
           const isOff = flag.kind === "off";
+          const isDoubleYellow = flag.kind === "yellow" && flag.data === "double";
+          const isRain = flag.kind === "rain";
+          const isSC = flag.kind === "safety_car";
+          const isVSC = flag.kind === "virtual_safety_car";
+          const isChequered = flag.kind === "chequered";
+          const isSlippery = flag.kind === "yellow_red_striped";
+
           const fill = isOff ? "#0f172a" : svgFlagColour(flag);
           const textFill = isOff ? "#94a3b8" : svgFlagTextColour(flag);
           const border = isHighlight ? "#38bdf8" : isOff ? "#334155" : svgFlagTextColour(flag);
-          const label = !isOff && labelFor(flag) !== "—" ? labelFor(flag) : (p.id < 10 ? `0${p.id}` : `${p.id}`);
+          const label =
+            !isOff && labelFor(flag) !== "—"
+              ? labelFor(flag)
+              : p.id < 10
+                ? `0${p.id}`
+                : `${p.id}`;
           const pulse = !isOff && display.flashing ? "animate-flag-flash" : "";
 
+          // Double Yellow badge: high-visibility hazard black & gold circle with outer ring
+          if (isDoubleYellow) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125 animate-pulse"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={13}
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth={1.8}
+                  strokeDasharray="3 2"
+                />
+                <circle
+                  r={9.5}
+                  fill="#f59e0b"
+                  stroke="#000000"
+                  strokeWidth={1.5}
+                  className="drop-shadow"
+                />
+                <text
+                  y={3}
+                  textAnchor="middle"
+                  fontSize={7}
+                  fontFamily="ui-monospace, monospace"
+                  fontWeight={900}
+                  fill="#000000"
+                >
+                  YY
+                </text>
+                <title>
+                  Panel #{p.id} · DOUBLE YELLOW (PELIGRO MÁXIMO)
+                </title>
+              </g>
+            );
+          }
+
+          // Rain badge: aqua-cyan with water droplet icon
+          if (isRain) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={12}
+                  fill="none"
+                  stroke="#38bdf8"
+                  strokeWidth={1.5}
+                  className="animate-ping opacity-50"
+                />
+                <circle
+                  r={9.5}
+                  fill="#0284c7"
+                  stroke="#38bdf8"
+                  strokeWidth={1.5}
+                  className="drop-shadow"
+                />
+                <text y={3.5} textAnchor="middle" fontSize={8}>
+                  🌧️
+                </text>
+                <title>Panel #{p.id} · RAIN (PISTA HÚMEDA)</title>
+              </g>
+            );
+          }
+
+          // SC badge: amber emergency roof lightbar theme
+          if (isSC) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125 animate-pulse"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={13}
+                  fill="none"
+                  stroke="#ff7a00"
+                  strokeWidth={2}
+                  className="animate-ping opacity-60"
+                />
+                <circle
+                  r={9.5}
+                  fill="#ff7a00"
+                  stroke="#000000"
+                  strokeWidth={1.5}
+                  className="drop-shadow"
+                />
+                <text
+                  y={3}
+                  textAnchor="middle"
+                  fontSize={7}
+                  fontFamily="ui-monospace, monospace"
+                  fontWeight={900}
+                  fill="#000000"
+                >
+                  SC
+                </text>
+                <title>Panel #{p.id} · SAFETY CAR</title>
+              </g>
+            );
+          }
+
+          // VSC badge: high-contrast neon amber on carbon black
+          if (isVSC) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={9.5}
+                  fill="#0f172a"
+                  stroke="#fbbf24"
+                  strokeWidth={2}
+                  className="drop-shadow"
+                />
+                <text
+                  y={3}
+                  textAnchor="middle"
+                  fontSize={6.5}
+                  fontFamily="ui-monospace, monospace"
+                  fontWeight={900}
+                  fill="#fbbf24"
+                >
+                  VSC
+                </text>
+                <title>Panel #{p.id} · VIRTUAL SAFETY CAR</title>
+              </g>
+            );
+          }
+
+          // Chequered flag badge
+          if (isChequered) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={9.5}
+                  fill="#0f172a"
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                  className="drop-shadow"
+                />
+                <text y={3.5} textAnchor="middle" fontSize={8}>
+                  🏁
+                </text>
+                <title>Panel #{p.id} · CHEQUERED</title>
+              </g>
+            );
+          }
+
+          // Slippery badge
+          if (isSlippery) {
+            return (
+              <g
+                key={`badge-${p.id}`}
+                transform={`translate(${badgePos.x.toFixed(2)} ${badgePos.y.toFixed(2)})`}
+                className="cursor-pointer transition-transform duration-150 hover:scale-125"
+                onClick={() => onPanelClick?.(p)}
+              >
+                <circle
+                  r={9.5}
+                  fill="#eab308"
+                  stroke="#dc2626"
+                  strokeWidth={2}
+                  className="drop-shadow"
+                />
+                <text
+                  y={3}
+                  textAnchor="middle"
+                  fontSize={6.5}
+                  fontFamily="ui-monospace, monospace"
+                  fontWeight={900}
+                  fill="#dc2626"
+                >
+                  OIL
+                </text>
+                <title>Panel #{p.id} · SLIPPERY</title>
+              </g>
+            );
+          }
+
+          // Standard badge (post number or flag code)
           return (
             <g
               key={`badge-${p.id}`}
@@ -722,27 +1344,27 @@ function svgFlagColour(flag: import("@/types/FlagState").FlagState): string {
     case "green":
       return "#0bd964";
     case "yellow":
-      return "#ffcc00";
+      return flag.data === "double" ? "#f59e0b" : "#facc15";
     case "blue":
-      return "#0078ff";
+      return "#1d4ed8";
     case "white":
       return "#f8fafc";
     case "yellow_red_striped":
-      return "#fb923c";
+      return "#f59e0b";
     case "rain":
-      return "#0ea5e9";
+      return "#0284c7";
     case "red":
-      return "#e8201f";
+      return "#dc2626";
     case "chequered":
       return "#111827";
     case "safety_car":
       return "#ff7a00";
     case "virtual_safety_car":
-      return "#ff7a00";
+      return "#fbbf24";
     case "vsc_ending":
-      return "#ff7a00";
+      return "#10b981";
     case "full_course_yellow":
-      return "#ffcc00";
+      return "#f59e0b";
     case "code60":
       return "#a21caf";
     case "slow_zone":

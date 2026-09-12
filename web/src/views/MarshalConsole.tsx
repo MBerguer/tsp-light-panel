@@ -208,22 +208,22 @@ export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewPr
 
               {/* Right column: 4 buttons */}
               <div className="order-3 flex flex-col gap-2.5 sm:gap-3 flex-1 md:flex-none items-center md:items-end">
-                <ButtonRow side="right" variant="yellow" label="YELLOW" sub="SINGLE" flag={{ kind: "yellow", data: "single" }}
+                <ButtonRow side="right" variant="yellow" label="YELLOW" sub="SINGLE ⚠️" flag={{ kind: "yellow", data: "single" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow", data: "single" })} />
-                <ButtonRow side="right" variant="yellow" label="YELLOW" sub="DOUBLE" flag={{ kind: "yellow", data: "double" }}
+                <ButtonRow side="right" variant="double_yellow" label="YELLOW" sub="DOUBLE ⚠️⚠️" flag={{ kind: "yellow", data: "double" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow", data: "double" })} />
                 <ButtonRow side="right" variant="dark" label="OFF" flag="off"
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "off" })} />
                 <ButtonRow
                   side="right"
-                  variant="yellow"
+                  variant="slippery"
                   label="SLIPPERY"
                   sub="OIL · WATER"
                   flag={{ kind: "yellow_red_striped" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow_red_striped" })}
                   onLongPress={() => submit({ scope: "zone", id: post }, { kind: "rain" })}
                   longPressMs={5000}
-                  longPressLabel="HOLD 5s → RAIN"
+                  longPressLabel="HOLD 5s → RAIN 🌧️💧"
                 />
               </div>
             </div>
@@ -276,7 +276,7 @@ export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewPr
 // Subcomponents
 // ============================================================================
 
-type Variant = "green" | "yellow" | "blue" | "white" | "dark";
+type Variant = "green" | "yellow" | "double_yellow" | "blue" | "white" | "dark" | "slippery";
 
 interface ButtonRowProps {
   side: "left" | "right";
@@ -311,9 +311,13 @@ function ButtonRow({
   const palette: Record<Variant, string> = {
     green: "bg-emerald-500 text-emerald-950 ring-emerald-900 hover:bg-emerald-400",
     yellow: "bg-amber-400 text-amber-950 ring-amber-900 hover:bg-amber-300",
-    blue: "bg-sky-500 text-sky-950 ring-sky-900 hover:bg-sky-400",
+    double_yellow:
+      "bg-amber-500 text-slate-950 ring-4 ring-amber-400/90 hover:bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse",
+    blue: "bg-blue-600 text-white ring-blue-400 hover:bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]",
     white: "bg-slate-100 text-slate-900 ring-slate-300 hover:bg-white",
     dark: "bg-slate-800 text-slate-100 ring-slate-950 hover:bg-slate-700",
+    slippery:
+      "bg-gradient-to-r from-amber-400 via-red-600 to-amber-400 text-slate-950 ring-amber-400 hover:brightness-110",
   };
 
   // Long-press progress, 0..1. `null` means "not pressing".

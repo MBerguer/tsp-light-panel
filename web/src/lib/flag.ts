@@ -9,143 +9,248 @@ export interface FlagDisplay {
   bg: string;
   fg: string;
   label: string;
-  /** Whether the panel must flash (FIA single waving yellow, etc.). */
+  subLabel?: string;
+  icon?: string;
+  patternType?: "double-yellow" | "rain" | "chequered" | "slippery" | "vsc" | "code60";
   flashing: boolean;
+  urgent?: boolean;
 }
 
 export function describeFlag(flag: FlagState): FlagDisplay {
   switch (flag.kind) {
     case "off":
-      return { bg: "bg-flag-off", fg: "text-slate-300", label: "OFF", flashing: false };
-    case "green":
-      return { bg: "bg-flag-green", fg: "text-slate-950", label: "GREEN", flashing: false };
-    case "yellow":
       return {
-        bg: "bg-flag-yellow",
+        bg: "bg-slate-800/80 border-slate-700",
+        fg: "text-slate-300",
+        label: "OFF",
+        subLabel: "APAGAR TODO",
+        icon: "⚪",
+        flashing: false,
+      };
+    case "green":
+      return {
+        bg: "bg-emerald-500 border-emerald-400",
         fg: "text-slate-950",
-        label: flag.data === "double" ? "DOUBLE YELLOW" : "YELLOW",
+        label: "GREEN",
+        subLabel: "PISTA LIBRE",
+        icon: "🟢",
+        flashing: false,
+      };
+    case "yellow":
+      if (flag.data === "double") {
+        return {
+          bg: "bg-amber-500 border-amber-400",
+          fg: "text-slate-950",
+          label: "DOUBLE YELLOW",
+          subLabel: "PELIGRO MÁXIMO",
+          icon: "⚠️⚠️",
+          patternType: "double-yellow",
+          flashing: true,
+          urgent: true,
+        };
+      }
+      return {
+        bg: "bg-amber-400 border-amber-300",
+        fg: "text-slate-950",
+        label: "YELLOW",
+        subLabel: "PRECAUCIÓN",
+        icon: "⚠️",
         flashing: true,
       };
     case "blue":
-      return { bg: "bg-flag-blue", fg: "text-white", label: "BLUE", flashing: true };
+      return {
+        bg: "bg-blue-600 border-blue-400",
+        fg: "text-white",
+        label: "BLUE",
+        subLabel: "CEDER PASO",
+        icon: "🔵",
+        flashing: true,
+      };
     case "white":
-      return { bg: "bg-flag-white", fg: "text-slate-900", label: "WHITE", flashing: false };
+      return {
+        bg: "bg-slate-100 border-white",
+        fg: "text-slate-900",
+        label: "WHITE",
+        subLabel: "VEHÍCULO LENTO",
+        icon: "⚪",
+        flashing: false,
+      };
     case "yellow_red_striped":
       return {
-        bg: "bg-gradient-to-br from-flag-yellow to-flag-red",
+        bg: "border-amber-400",
         fg: "text-slate-950",
         label: "SLIPPERY",
+        subLabel: "ACEITE / AGUA",
+        icon: "🟡🔴",
+        patternType: "slippery",
         flashing: false,
       };
     case "rain":
       return {
-        bg: "bg-gradient-to-br from-sky-400 via-sky-500 to-sky-700",
+        bg: "bg-gradient-to-b from-sky-600 via-sky-700 to-blue-800 border-sky-400",
         fg: "text-white",
         label: "RAIN",
+        subLabel: "PISTA HÚMEDA",
+        icon: "🌧️",
+        patternType: "rain",
         flashing: false,
       };
     case "red":
-      return { bg: "bg-flag-red", fg: "text-white", label: "RED", flashing: false };
+      return {
+        bg: "bg-red-600 border-red-400",
+        fg: "text-white",
+        label: "RED",
+        subLabel: "DETENCIÓN TOTAL",
+        icon: "🚩",
+        flashing: false,
+        urgent: true,
+      };
     case "chequered":
       return {
-        bg: "bg-flag-chequered",
+        bg: "border-slate-400",
         fg: "text-white",
         label: "CHEQUERED",
+        subLabel: "FIN DE SESIÓN",
+        icon: "🏁",
+        patternType: "chequered",
         flashing: false,
       };
     case "safety_car":
-      return { bg: "bg-flag-sc", fg: "text-slate-950", label: "SC", flashing: true };
+      return {
+        bg: "bg-amber-500 border-amber-400",
+        fg: "text-slate-950",
+        label: "SC",
+        subLabel: "SAFETY CAR",
+        icon: "🚨",
+        flashing: true,
+        urgent: true,
+      };
     case "virtual_safety_car":
-      return { bg: "bg-flag-vsc", fg: "text-slate-950", label: "VSC", flashing: true };
+      return {
+        bg: "bg-slate-950 border-2 border-amber-400",
+        fg: "text-amber-300",
+        label: "VSC",
+        subLabel: "VIRTUAL SC",
+        icon: "⚡",
+        patternType: "vsc",
+        flashing: true,
+      };
     case "vsc_ending":
       return {
-        bg: "bg-flag-vsc",
+        bg: "bg-gradient-to-r from-amber-500 via-emerald-600 to-emerald-500 border-emerald-400",
         fg: "text-slate-950",
         label: "VSC END",
+        subLabel: "PREP REINICIO",
+        icon: "⚡🟢",
         flashing: true,
       };
     case "full_course_yellow":
       return {
-        bg: "bg-flag-yellow",
+        bg: "bg-amber-400 border-amber-300",
         fg: "text-slate-950",
         label: "FCY",
+        subLabel: "80 KM/H LIMIT",
+        icon: "⚠️",
         flashing: true,
       };
     case "code60":
       return {
-        bg: "bg-fuchsia-600",
+        bg: "bg-purple-700 border-purple-500",
         fg: "text-white",
         label: "CODE 60",
+        subLabel: "MÁX 60 KM/H",
+        icon: "🛑",
+        patternType: "code60",
         flashing: false,
       };
     case "slow_zone":
       return {
-        bg: "bg-flag-yellow",
+        bg: "bg-amber-400 border-amber-300",
         fg: "text-slate-950",
         label: "SZ",
+        subLabel: "ZONA LENTA",
+        icon: "⚠️",
         flashing: true,
       };
     case "next_slow":
       return {
-        bg: "bg-flag-yellow",
+        bg: "bg-amber-300 border-amber-200",
         fg: "text-slate-950",
         label: "NEXT SLOW",
+        subLabel: "AVISO LENTO",
+        icon: "⚠️",
         flashing: true,
       };
     case "pit_entry_open":
       return {
-        bg: "bg-emerald-500",
+        bg: "bg-emerald-500 border-emerald-400",
         fg: "text-slate-950",
         label: "PIT OPEN",
+        subLabel: "BOXES ABIERTOS",
+        icon: "🟢",
         flashing: false,
       };
     case "pit_entry_closed":
       return {
-        bg: "bg-rose-700",
+        bg: "bg-rose-700 border-rose-500",
         fg: "text-white",
         label: "PIT CLOSED",
+        subLabel: "BOXES CERRADOS",
+        icon: "⛔",
         flashing: false,
       };
     case "standing_start":
       return {
-        bg: "bg-amber-500",
+        bg: "bg-amber-500 border-amber-400",
         fg: "text-slate-950",
         label: "STD START",
+        subLabel: "LARGADA PARADA",
+        icon: "🚦",
         flashing: true,
       };
     case "rolling_start":
       return {
-        bg: "bg-amber-400",
+        bg: "bg-amber-400 border-amber-300",
         fg: "text-slate-950",
         label: "ROLL START",
+        subLabel: "LARGADA MOV.",
+        icon: "🏎️",
         flashing: true,
       };
     case "custom_blue":
       return {
-        bg: "bg-flag-blue",
+        bg: "bg-blue-700 border-blue-500",
         fg: "text-white",
         label: "BLUE+",
+        subLabel: "PRIORIDAD RET.",
+        icon: "🔵+",
         flashing: true,
       };
     case "black_for_driver":
       return {
-        bg: "bg-flag-chequered",
+        bg: "bg-slate-950 border-slate-700",
         fg: "text-white",
         label: `BLACK #${flag.data}`,
+        subLabel: "EXCLUSIÓN",
+        icon: "⬛",
         flashing: false,
       };
     case "black_orange_disc":
       return {
-        bg: "bg-flag-driver",
-        fg: "text-white",
+        bg: "bg-slate-950 border-amber-500",
+        fg: "text-amber-400",
         label: `MECH #${flag.data}`,
+        subLabel: "FALLA MECÁNICA",
+        icon: "🟠",
         flashing: false,
       };
     case "black_white_diagonal":
       return {
-        bg: "bg-flag-driver",
+        bg: "bg-slate-950 border-slate-600",
         fg: "text-white",
         label: `WARN #${flag.data}`,
+        subLabel: "APERCIBIMIENTO",
+        icon: "⚠️",
         flashing: false,
       };
   }

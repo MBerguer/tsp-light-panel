@@ -40,3 +40,24 @@
   }
 }
 
+@keyframes strobe-light {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px #f59e0b); }
+  50% { opacity: 0.2; filter: none; }
+}
+
+@keyframes rain-drop-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes hazard-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.7)); }
+  50% { filter: drop-shadow(0 0 14px rgba(245, 158, 11, 1)); }
+}
+
+@keyframes water-ripple {
+  0% { r: 2; opacity: 0.8; stroke-width: 1.5; }
+  100% { r: 8; opacity: 0; stroke-width: 0.2; }
+}
+
+

@@ -76,10 +76,16 @@ export function RaceControlView() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 sm:gap-2.5">
             <FlagButton
               flag={{ kind: "green" }}
               onClick={() => submit(globalTarget, { kind: "green" })}
+            />
+            <FlagButton
+              flag={{ kind: "yellow", data: "single" }}
+              onClick={() =>
+                submit(globalTarget, { kind: "yellow", data: "single" })
+              }
             />
             <FlagButton
               flag={{ kind: "yellow", data: "double" }}
