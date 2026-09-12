@@ -69,6 +69,7 @@ interface AppState {
   mode: "track" | "demo";
   authRequired: boolean;
   authenticated: boolean;
+  authRole: "race_control" | "marshal" | null;
   userName: string | null;
   marshalPost: number | null;
   marshalRoster: MarshalPresenceEntry[];
@@ -81,6 +82,7 @@ interface AppState {
 
   init(): Promise<void>;
   setRole(role: ClientRole): void;
+  returnToRaceControl(): void;
   login(params: {
     role: "race_control" | "marshal";
     name?: string;
@@ -226,6 +228,7 @@ export const useStore = create<AppState>((set, get) => {
     mode: "track",
     authRequired: true,
     authenticated: false,
+    authRole: null,
     userName: null,
     marshalPost: null,
     marshalRoster: [],
@@ -249,6 +252,7 @@ export const useStore = create<AppState>((set, get) => {
               authenticated: true,
               userName: session.name || null,
               marshalPost: session.post || null,
+              authRole: session.role.role === "marshal" ? "marshal" : "race_control",
             });
             if (session.role.role === "marshal" || session.role.role === "race_control") {
               initialRole = session.role;
@@ -291,6 +295,23 @@ export const useStore = create<AppState>((set, get) => {
       await Promise.all([get().loadScenarios(), get().loadCircuits()]);
     },
 
+    returnToRaceControl() {
+      const savedSessionStr = safeStorageGet("tsp_auth_session");
+      let rcRole: ClientRole = defaultRole();
+      if (savedSessionStr) {
+        try {
+          const session = JSON.parse(savedSessionStr);
+          if (session?.role?.role === "race_control") {
+            rcRole = session.role;
+          }
+        } catch {
+          // ignore
+        }
+      }
+      set({ role: rcRole });
+      get().client?.setRole(rcRole);
+    },
+
     async login(params) {
       try {
         const body =
@@ -316,6 +337,7 @@ export const useStore = create<AppState>((set, get) => {
         const newRole: ClientRole = data.role;
         const userName: string = data.name;
         const marshalPost = params.role === "marshal" ? Number(params.post) : null;
+        const authRole = params.role === "race_control" ? "race_control" : "marshal";
 
         safeStorageSet(
           "tsp_auth_session",
@@ -324,6 +346,7 @@ export const useStore = create<AppState>((set, get) => {
 
         set({
           authenticated: true,
+          authRole,
           userName,
           marshalPost,
           role: newRole,
@@ -350,6 +373,7 @@ export const useStore = create<AppState>((set, get) => {
       const defRole = defaultRole();
       set({
         authenticated: false,
+        authRole: null,
         userName: null,
         marshalPost: null,
         role: defRole,

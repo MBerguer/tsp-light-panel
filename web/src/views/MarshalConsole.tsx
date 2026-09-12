@@ -25,7 +25,11 @@ import { safeRandomUUID } from "@/lib/uuid";
  * read-only LEDs (those flags are race-control-only; the marshal only
  * *sees* them, it cannot trigger them).
  */
-export function MarshalConsoleView() {
+interface MarshalConsoleViewProps {
+  onBackToRaceControl?: () => void;
+}
+
+export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewProps = {}) {
   const role = useStore((s) => s.role);
   const setRole = useStore((s) => s.setRole);
   const topology = useStore((s) => s.topology);
@@ -34,6 +38,8 @@ export function MarshalConsoleView() {
   const checkInMarshal = useStore((s) => s.checkInMarshal);
   const logout = useStore((s) => s.logout);
   const authRequired = useStore((s) => s.authRequired);
+  const authRole = useStore((s) => s.authRole);
+  const returnToRaceControl = useStore((s) => s.returnToRaceControl);
 
   const post = role.role === "marshal" ? role.data.post : -1;
   const allZones = topology?.zones ?? [];
@@ -62,7 +68,13 @@ export function MarshalConsoleView() {
   const submit = useMarshalCommand(role);
 
   if (role.role !== "marshal") {
-    return <RoleSelector currentRole={role} onPick={setRole} />;
+    return (
+      <RoleSelector
+        currentRole={role}
+        onPick={setRole}
+        onBack={onBackToRaceControl}
+      />
+    );
   }
 
   if (zonePanels.length === 0) {
@@ -88,44 +100,79 @@ export function MarshalConsoleView() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                Puesto de Comisario
+                {authRole === "race_control" ? "Consola de Comisario (Supervisión RC)" : "Puesto de Comisario"}
               </span>
-              <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                ONLINE
+              <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                authRole === "race_control"
+                  ? "bg-sky-500/15 border border-sky-500/30 text-sky-400"
+                  : "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${
+                  authRole === "race_control" ? "bg-sky-400" : "bg-emerald-400 animate-pulse"
+                }`} />
+                {authRole === "race_control" ? "SUPERVISIÓN" : "ONLINE"}
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-100">
               Puesto #{post} — {currentZone?.label ?? "?"}
             </h2>
             {userName && (
-              <p className="text-xs text-sky-400 font-medium">
-                Operado por: <span className="font-bold">{userName}</span>
+              <p className="text-xs text-slate-400 font-medium">
+                {authRole === "race_control" ? "Inspector: " : "Operado por: "}
+                <span className="font-bold text-slate-200">{userName}</span>
               </p>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="rounded-lg border border-sky-500/30 bg-sky-950/20 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-900/40 active:scale-95 transition-all"
-              onClick={checkInMarshal}
-              title="Re-notifica a Race Control que el comisario está activo"
-            >
-              ✓ Confirmar Check-in
-            </button>
-            <button
-              type="button"
-              className="btn text-xs sm:text-sm text-slate-400 hover:text-slate-200"
-              onClick={() => {
-                if (authRequired) {
-                  logout();
-                } else {
-                  setRole({ role: "spectator" });
-                }
-              }}
-            >
-              Salir del puesto
-            </button>
+            {authRole === "marshal" && (
+              <button
+                type="button"
+                className="rounded-lg border border-sky-500/30 bg-sky-950/20 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-900/40 active:scale-95 transition-all"
+                onClick={checkInMarshal}
+                title="Re-notifica a Race Control que el comisario está activo"
+              >
+                ✓ Confirmar Check-in
+              </button>
+            )}
+
+            {authRole === "race_control" ? (
+              <>
+                <button
+                  type="button"
+                  className="rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-300 active:scale-95 transition-all"
+                  onClick={() => {
+                    returnToRaceControl();
+                  }}
+                  title="Ver la lista de puestos de bandera"
+                >
+                  Cambiar Puesto
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs font-bold text-white shadow-md active:scale-95 transition-all"
+                  onClick={() => {
+                    returnToRaceControl();
+                    onBackToRaceControl?.();
+                  }}
+                >
+                  ← Volver a Race Control
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="btn text-xs sm:text-sm text-slate-400 hover:text-slate-200"
+                onClick={() => {
+                  if (authRequired) {
+                    logout();
+                  } else {
+                    setRole({ role: "spectator" });
+                  }
+                }}
+              >
+                Salir del puesto
+              </button>
+            )}
           </div>
         </header>
 
@@ -584,19 +631,35 @@ function detectGlobalIndicators(panels: Panel[]): {
 function RoleSelector({
   currentRole,
   onPick,
+  onBack,
 }: {
   currentRole: ClientRole;
   onPick(role: ClientRole): void;
+  onBack?: () => void;
 }) {
   const topology = useStore((s) => s.topology);
+  const authRole = useStore((s) => s.authRole);
   if (!topology) return null;
   return (
     <div className="card flex flex-col gap-3">
-      <div>
-        <h3 className="text-base sm:text-lg font-bold">Pick a marshal post</h3>
-        <p className="text-xs sm:text-sm text-slate-400">
-          Currently signed in as {currentRole.role}.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base sm:text-lg font-bold">Seleccionar Puesto de Bandera</h3>
+          <p className="text-xs sm:text-sm text-slate-400">
+            {authRole === "race_control"
+              ? "Supervisión de puestos de comisario desde Control de Carrera"
+              : `Sesión actual: ${currentRole.role}`}
+          </p>
+        </div>
+        {onBack && authRole === "race_control" && (
+          <button
+            type="button"
+            className="rounded-lg bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs font-bold text-white shadow transition-all active:scale-95"
+            onClick={onBack}
+          >
+            ← Volver a Control de Carrera
+          </button>
+        )}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
         {topology.zones.map((z) => (

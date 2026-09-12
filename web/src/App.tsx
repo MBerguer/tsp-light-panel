@@ -28,6 +28,8 @@ export default function App() {
   const authenticated = useStore((s) => s.authenticated);
   const userName = useStore((s) => s.userName);
   const logout = useStore((s) => s.logout);
+  const authRole = useStore((s) => s.authRole);
+  const returnToRaceControl = useStore((s) => s.returnToRaceControl);
 
   const [tab, setTab] = useState<TabId>("race_control");
 
@@ -35,14 +37,12 @@ export default function App() {
     init();
   }, [init]);
 
-  // If marshal logs in, direct them to marshal console
+  // If authenticated as marshal, always ensure marshal tab is active
   useEffect(() => {
-    if (role.role === "marshal") {
+    if (authRole === "marshal") {
       setTab("marshal");
-    } else if (role.role === "race_control" && tab === "marshal" && authRequired) {
-      setTab("race_control");
     }
-  }, [role.role, authRequired]);
+  }, [authRole]);
 
   // Auto-align role with tab in demo mode
   useEffect(() => {
@@ -65,6 +65,13 @@ export default function App() {
     }
   }, [tab, role.role, setRole, authRequired]);
 
+  const handleTabChange = (newTab: TabId) => {
+    if (newTab === "race_control" && authRole === "race_control" && role.role !== "race_control") {
+      returnToRaceControl();
+    }
+    setTab(newTab);
+  };
+
   if (authRequired && !authenticated) {
     return <LoginView />;
   }
@@ -74,7 +81,7 @@ export default function App() {
       <Header
         status={status}
         tab={tab}
-        setTab={setTab}
+        setTab={handleTabChange}
         role={role}
         mode={mode}
         userName={userName}
@@ -86,7 +93,11 @@ export default function App() {
         {tab === "scenario" && <ScenarioPlayerView />}
         {tab === "editor" && <EditorView />}
         {tab === "replay" && <ReplayView />}
-        {tab === "marshal" && <MarshalConsoleView />}
+        {tab === "marshal" && (
+          <MarshalConsoleView
+            onBackToRaceControl={() => handleTabChange("race_control")}
+          />
+        )}
         {tab === "engineering" && <EngineeringRoomView />}
       </main>
     </div>
