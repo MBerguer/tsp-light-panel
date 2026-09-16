@@ -91,6 +91,15 @@ async fn main() -> Result<()> {
 
     let scenarios = Arc::new(ScenarioController::new(world.clone(), system_rc_operator));
     let gateway = GatewayState::new(world.clone(), scenarios.clone());
+
+    let udp_target_str = std::env::var("TSP_UDP_BROADCAST_ADDR")
+        .unwrap_or_else(|_| "255.255.255.255:8888".into());
+    if let Ok(udp_target) = udp_target_str.parse::<SocketAddr>() {
+        tsp_server::udp_broadcast::spawn_udp_broadcaster(world.clone(), udp_target);
+    } else {
+        tracing::warn!(target = %udp_target_str, "invalid TSP_UDP_BROADCAST_ADDR, UDP broadcasting disabled");
+    }
+
     let state = AppState {
         gateway: gateway.clone(),
         scenarios: scenarios.clone(),

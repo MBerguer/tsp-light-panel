@@ -25,6 +25,7 @@ pub mod gateway;
 pub mod scenario_library;
 pub mod scenario_runtime;
 pub mod topology;
+pub mod udp_broadcast;
 pub mod world;
 
 pub use bus::EventBus;
