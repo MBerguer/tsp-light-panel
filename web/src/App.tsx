@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { RaceControlView } from "@/views/RaceControl";
 import { MarshalConsoleView } from "@/views/MarshalConsole";
@@ -7,6 +7,7 @@ import { ScenarioPlayerView } from "@/views/ScenarioPlayer";
 import { ReplayView } from "@/views/Replay";
 import { EditorView } from "@/views/Editor";
 import { LoginView } from "@/views/LoginView";
+import { LightPanelView } from "@/views/LightPanelView";
 import type { ClientRole } from "@/types/ClientRole";
 import { safeRandomUUID, safeStorageGet, safeStorageSet } from "@/lib/uuid";
 
@@ -16,7 +17,8 @@ type TabId =
   | "editor"
   | "replay"
   | "marshal"
-  | "engineering";
+  | "engineering"
+  | "panel_display";
 
 export default function App() {
   const init = useStore((s) => s.init);
@@ -32,6 +34,14 @@ export default function App() {
   const returnToRaceControl = useStore((s) => s.returnToRaceControl);
 
   const [tab, setTab] = useState<TabId>("race_control");
+
+  // If opened directly as a dedicated physical panel kiosk (?panel=X or ?post=X), render full screen
+  const kioskPanelId = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get("panel") ?? params.get("post") ?? params.get("id");
+    return p ? parseInt(p, 10) : null;
+  }, []);
 
   useEffect(() => {
     init();
@@ -72,6 +82,15 @@ export default function App() {
     setTab(newTab);
   };
 
+  // Dedicated physical display device kiosk (bypasses login for field displays)
+  if (kioskPanelId != null) {
+    return (
+      <div className="h-screen w-screen bg-black overflow-hidden">
+        <LightPanelView defaultPanelId={kioskPanelId} kioskMode={true} />
+      </div>
+    );
+  }
+
   if (authRequired && !authenticated) {
     return <LoginView />;
   }
@@ -99,6 +118,11 @@ export default function App() {
           />
         )}
         {tab === "engineering" && <EngineeringRoomView />}
+        {tab === "panel_display" && (
+          <div className="h-full rounded-2xl overflow-hidden border border-white/10 bg-black">
+            <LightPanelView />
+          </div>
+        )}
       </main>
     </div>
   );
@@ -191,6 +215,9 @@ function Header({
             <TabButton id="engineering" current={tab} onClick={setTab}>
               Diagnóstico / Salud
             </TabButton>
+            <TabButton id="panel_display" current={tab} onClick={setTab}>
+              Pantalla Panel
+            </TabButton>
           </>
         ) : (
           <>
@@ -211,6 +238,9 @@ function Header({
             </TabButton>
             <TabButton id="engineering" current={tab} onClick={setTab}>
               Engineering
+            </TabButton>
+            <TabButton id="panel_display" current={tab} onClick={setTab}>
+              Panel Display
             </TabButton>
           </>
         )}
