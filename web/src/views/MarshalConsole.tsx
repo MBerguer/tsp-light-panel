@@ -297,6 +297,22 @@ interface ButtonRowProps {
    * binding (e.g. `"HOLD 5s → RAIN"`). */
   longPressLabel?: string;
 }
+const EMOJI_REGEX =
+  /(\p{Extended_Pictographic}(?:[\uFE00-\uFE0F]|\u200D\p{Extended_Pictographic})*)/gu;
+
+function renderWithEmojiShadow(text: string) {
+  const parts = text.split(EMOJI_REGEX);
+  return parts.map((part, i) =>
+    EMOJI_REGEX.test(part) ? (
+      <span key={i} className="emoji-shadow inline-block mx-0.5">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
 function ButtonRow({
   side,
   variant,
@@ -403,7 +419,7 @@ function ButtonRow({
       </span>
       {sub && (
         <span className="relative text-[8px] sm:text-[9px] font-bold uppercase opacity-90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
-          {sub}
+          {renderWithEmojiShadow(sub)}
         </span>
       )}
     </button>
@@ -430,7 +446,13 @@ function ButtonRow({
             side === "right" ? "text-right" : "text-left"
           } ${showProgress ? "text-sky-300" : "text-slate-500"}`}
         >
-          {showProgress ? `${pct}% · ${longPressLabel}` : longPressLabel}
+          {showProgress ? (
+            <>
+              {pct}% · {renderWithEmojiShadow(longPressLabel)}
+            </>
+          ) : (
+            renderWithEmojiShadow(longPressLabel)
+          )}
         </span>
       )}
     </div>

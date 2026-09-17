@@ -56,7 +56,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {d.patternType === "chequered" && (
         <div className="absolute inset-0 flex items-center justify-center p-1.5">
           <div className="flex h-full w-full flex-col items-center justify-center rounded-lg bg-slate-950/85 backdrop-blur-sm px-2 py-1">
-            <span className="text-base sm:text-lg">🏁</span>
+            <span className="text-base sm:text-lg emoji-shadow">🏁</span>
             <span className="text-xs sm:text-sm font-black tracking-wider text-white">
               CHEQUERED
             </span>
@@ -71,11 +71,11 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
         <div className="absolute inset-1 flex items-center justify-center rounded-lg bg-black/85 backdrop-blur-sm p-1 border border-amber-400/90 shadow-inner">
           <div className="flex flex-col items-center justify-center">
             <div className="flex items-center gap-1">
-              <span className="text-xs">⚠️</span>
+              <span className="text-xs emoji-shadow">⚠️</span>
               <span className="text-xs font-black tracking-wider text-amber-300">
                 DOUBLE YELLOW
               </span>
-              <span className="text-xs">⚠️</span>
+              <span className="text-xs emoji-shadow">⚠️</span>
             </div>
             <span className="text-[9px] font-extrabold uppercase tracking-tight text-amber-400">
               PELIGRO MÁXIMO
@@ -87,7 +87,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {d.patternType === "slippery" && (
         <div className="absolute inset-1 flex items-center justify-center rounded-lg bg-slate-950/80 backdrop-blur-sm p-1">
           <div className="flex flex-col items-center justify-center">
-            <span className="text-xs">🟡🔴</span>
+            <span className="text-xs emoji-shadow">🟡🔴</span>
             <span className="text-xs font-black tracking-wider text-amber-300">
               SLIPPERY
             </span>
@@ -102,9 +102,9 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
         <div className="flex flex-col items-center justify-center w-full">
           {/* Authentic vertical water drops */}
           <div className="flex items-center justify-center gap-1 mb-0.5">
-            <span className="text-sm">🌧️</span>
-            <span className="inline-block text-cyan-300 text-xs">💧</span>
-            <span className="inline-block text-cyan-200 text-xs">💧</span>
+            <span className="text-sm emoji-shadow">🌧️</span>
+            <span className="inline-block text-cyan-300 text-xs emoji-shadow">💧</span>
+            <span className="inline-block text-cyan-200 text-xs emoji-shadow">💧</span>
           </div>
           <span className="text-xs sm:text-sm font-black tracking-wider text-cyan-300 drop-shadow-[0_0_8px_rgba(0,212,255,0.6)]">
             RAIN
@@ -118,7 +118,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {flag.kind === "safety_car" && (
         <div className="flex flex-col items-center justify-center w-full">
           <div className="flex items-center gap-1 mb-0.5">
-            <span className="text-xs">🚨</span>
+            <span className="text-xs emoji-shadow">🚨</span>
             <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
               SC
             </span>
@@ -132,7 +132,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {flag.kind === "virtual_safety_car" && (
         <div className="flex flex-col items-center justify-center w-full">
           <div className="flex items-center gap-1 mb-0.5">
-            <span className="text-xs text-amber-300">⚡</span>
+            <span className="text-xs text-amber-300 emoji-shadow">⚡</span>
             <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
               VSC
             </span>
@@ -146,7 +146,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {flag.kind === "vsc_ending" && (
         <div className="flex flex-col items-center justify-center w-full">
           <div className="flex items-center gap-1 mb-0.5">
-            <span className="text-xs">⚡🟢</span>
+            <span className="text-xs emoji-shadow">⚡🟢</span>
             <span className="text-xs sm:text-sm font-black tracking-wider text-white font-mono drop-shadow">
               VSC END
             </span>
@@ -160,7 +160,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {flag.kind === "full_course_yellow" && (
         <div className="flex flex-col items-center justify-center w-full">
           <div className="flex items-center gap-1 mb-0.5">
-            <span className="text-xs text-amber-300">⚠️</span>
+            <span className="text-xs text-amber-300 emoji-shadow">⚠️</span>
             <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
               FCY
             </span>
@@ -188,7 +188,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       {/* Standard / Other Flags */}
       {!d.patternType && flag.kind !== "safety_car" && (
         <div className="flex flex-col items-center justify-center">
-          {d.icon && <span className="text-xs mb-0.5">{d.icon}</span>}
+          {d.icon && <span className="text-xs mb-0.5 emoji-shadow">{d.icon}</span>}
           <span className="text-xs sm:text-sm font-black tracking-wider leading-tight">
             {d.label}
           </span>

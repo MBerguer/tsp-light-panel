@@ -335,7 +335,7 @@ export function TrackMap({
       {globalIndicators.sc && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-amber-400 bg-amber-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-amber-200 shadow-[0_0_25px_rgba(245,158,11,0.6)] backdrop-blur animate-pulse pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg">🚨</span>
+            <span className="text-base sm:text-lg emoji-shadow">🚨</span>
             <span className="rounded bg-amber-400 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
               SAFETY CAR
             </span>
@@ -351,7 +351,7 @@ export function TrackMap({
       {globalIndicators.vsc && !globalIndicators.sc && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-amber-400 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-amber-300 shadow-[0_0_25px_rgba(251,191,36,0.5)] backdrop-blur pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg text-amber-400">⚡</span>
+            <span className="text-base sm:text-lg text-amber-400 emoji-shadow">⚡</span>
             <span className="rounded border border-amber-400 bg-slate-900 px-2 py-0.5 font-mono font-black text-amber-300 text-xs sm:text-sm">
               VSC
             </span>
@@ -367,7 +367,7 @@ export function TrackMap({
       {globalIndicators.vscEnding && !globalIndicators.vsc && !globalIndicators.sc && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-emerald-400 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.5)] backdrop-blur animate-pulse pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg">⚡🟢</span>
+            <span className="text-base sm:text-lg emoji-shadow">⚡🟢</span>
             <span className="rounded bg-emerald-500 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
               VSC ENDING
             </span>
@@ -382,7 +382,7 @@ export function TrackMap({
       {globalIndicators.red && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-red-500 bg-red-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-red-100 shadow-[0_0_30px_rgba(239,68,68,0.7)] backdrop-blur animate-pulse pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg">🚩</span>
+            <span className="text-base sm:text-lg emoji-shadow">🚩</span>
             <span className="rounded bg-red-600 px-2 py-0.5 font-black text-white text-xs sm:text-sm">
               RED FLAG
             </span>
@@ -398,15 +398,15 @@ export function TrackMap({
       {globalIndicators.rain && !globalIndicators.red && !globalIndicators.sc && !globalIndicators.vsc && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-sky-400 bg-sky-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-sky-200 shadow-[0_0_25px_rgba(56,189,248,0.5)] backdrop-blur pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg">🌧️</span>
+            <span className="text-base sm:text-lg emoji-shadow">🌧️</span>
             <span className="rounded bg-sky-500 px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
               WET TRACK
             </span>
             <span className="hidden sm:inline font-bold">PISTA HÚMEDA · CONDICIONES DE LLUVIA</span>
           </div>
           <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-sky-300">
-            <span className="inline-block animate-bounce">💧</span>
-            <span className="inline-block animate-bounce delay-100">💧</span>
+            <span className="inline-block animate-bounce emoji-shadow">💧</span>
+            <span className="inline-block animate-bounce delay-100 emoji-shadow">💧</span>
             <span>RAIN ACTIVE</span>
           </div>
         </div>
@@ -415,7 +415,7 @@ export function TrackMap({
       {globalIndicators.chequered && !globalIndicators.red && (
         <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-20 flex items-center justify-between rounded-xl border-2 border-slate-300 bg-slate-950/95 px-3 py-1.5 sm:px-4 sm:py-2 text-white shadow-2xl backdrop-blur pointer-events-none">
           <div className="flex items-center gap-2 font-black text-xs sm:text-sm tracking-wider">
-            <span className="text-base sm:text-lg">🏁</span>
+            <span className="text-base sm:text-lg emoji-shadow">🏁</span>
             <span className="rounded bg-white px-2 py-0.5 font-black text-slate-950 text-xs sm:text-sm">
               CHEQUERED FLAG
             </span>
@@ -436,12 +436,12 @@ export function TrackMap({
             <div className="flex items-center gap-2">
               {globalIndicators.doubleYellowCount > 0 ? (
                 <span className="flex items-center gap-1 rounded-md bg-amber-500/20 border border-amber-500/60 px-2 py-0.5 font-extrabold text-[11px] text-amber-300 backdrop-blur shadow-sm animate-pulse">
-                  <span>⚠️⚠️</span>
+                  <span className="emoji-shadow">⚠️⚠️</span>
                   <span>{globalIndicators.doubleYellowCount} SECTOR(ES) DOUBLE YELLOW</span>
                 </span>
               ) : globalIndicators.singleYellowCount > 0 ? (
                 <span className="flex items-center gap-1 rounded-md bg-yellow-500/20 border border-yellow-500/50 px-2 py-0.5 font-bold text-[11px] text-yellow-300 backdrop-blur">
-                  <span>⚠️</span>
+                  <span className="emoji-shadow">⚠️</span>
                   <span>{globalIndicators.singleYellowCount} SECTOR(ES) AMARILLO SIMPLE</span>
                 </span>
               ) : (
@@ -453,7 +453,7 @@ export function TrackMap({
 
               {globalIndicators.slipperyCount > 0 && (
                 <span className="flex items-center gap-1 rounded-md bg-orange-500/20 border border-orange-500/60 px-2 py-0.5 font-bold text-[11px] text-orange-300 backdrop-blur">
-                  <span>🟡🔴</span>
+                  <span className="emoji-shadow">🟡🔴</span>
                   <span>{globalIndicators.slipperyCount} RESBALADIZO</span>
                 </span>
               )}
