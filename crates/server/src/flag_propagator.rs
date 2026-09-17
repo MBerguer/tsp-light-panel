@@ -224,8 +224,7 @@ fn is_yellow(flag: FlagState) -> bool {
     matches!(
         flag,
         FlagState::Yellow(YellowKind::Single)
-            | FlagState::Yellow(YellowKind::Double)
-            | FlagState::YellowRedStriped,
+            | FlagState::Yellow(YellowKind::Double),
     )
 }
 
@@ -272,7 +271,7 @@ mod tests {
     fn classifies_yellow_variants() {
         assert!(is_yellow(FlagState::Yellow(YellowKind::Single)));
         assert!(is_yellow(FlagState::Yellow(YellowKind::Double)));
-        assert!(is_yellow(FlagState::YellowRedStriped));
+        assert!(!is_yellow(FlagState::YellowRedStriped));
         assert!(!is_yellow(FlagState::Green));
         assert!(!is_yellow(FlagState::Off));
         assert!(!is_yellow(FlagState::Red));

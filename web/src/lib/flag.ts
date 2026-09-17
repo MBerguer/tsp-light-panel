@@ -77,8 +77,8 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "yellow_red_striped":
       return {
-        bg: "border-amber-400",
-        fg: "text-slate-950",
+        bg: "bg-amber-400 border border-amber-300",
+        fg: "text-slate-950 font-black",
         label: "SLIPPERY",
         subLabel: "ACEITE / AGUA",
         icon: "🟡🔴",
@@ -107,7 +107,7 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "chequered":
       return {
-        bg: "border-slate-400",
+        bg: "bg-slate-900 border-slate-400",
         fg: "text-white",
         label: "CHEQUERED",
         subLabel: "FIN DE SESIÓN",

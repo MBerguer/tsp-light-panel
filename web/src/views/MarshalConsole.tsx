@@ -252,17 +252,47 @@ export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewPr
             return (
               <div
                 key={p.id}
-                className={`rounded-xl p-4 ${d.bg} ${d.fg} ${
+                style={
+                  d.patternType === "slippery"
+                    ? {
+                        backgroundImage: `repeating-linear-gradient(90deg, #ffcc00, #ffcc00 14px, #dc2626 14px, #dc2626 28px)`,
+                      }
+                    : d.patternType === "chequered"
+                      ? {
+                          backgroundImage: `repeating-conic-gradient(#0f172a 0% 25%, #f8fafc 0% 50%)`,
+                          backgroundSize: "16px 16px",
+                        }
+                      : d.patternType === "double-yellow"
+                        ? {
+                            background: "linear-gradient(135deg, #ffcc00 50%, #000000 50%)",
+                          }
+                        : undefined
+                }
+                className={`rounded-xl p-4 relative overflow-hidden ${d.bg} ${d.fg} ${
                   d.flashing ? "animate-flag-flash" : ""
                 }`}
               >
-                <div className="text-xs uppercase tracking-widest opacity-75">
-                  Panel #{p.id}
-                </div>
-                <div className="mt-1 text-2xl font-extrabold">{d.label}</div>
-                <div className="mt-2 text-[10px] opacity-60">
-                  dist {p.distance_m.toFixed(0)} m
-                </div>
+                {d.patternType ? (
+                  <div className="bg-slate-950/85 rounded-lg p-3 backdrop-blur-sm border border-white/20 text-white">
+                    <div className="text-xs uppercase tracking-widest text-slate-300">
+                      Panel #{p.id}
+                    </div>
+                    <div className="mt-1 text-2xl font-extrabold">{d.label}</div>
+                    <div className="mt-2 text-[10px] text-slate-300">
+                      dist {p.distance_m.toFixed(0)} m
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-xs uppercase tracking-widest opacity-75">
+                      Panel #{p.id}
+                    </div>
+                    <div className="mt-1 text-2xl font-extrabold">{d.label}</div>
+                    <div className="mt-2 text-[10px] opacity-60">
+                      dist {p.distance_m.toFixed(0)} m
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}
@@ -461,12 +491,29 @@ function ButtonRow({
 
 function FlagIcon({ flag }: { flag: FlagState }) {
   const d = describeFlag(flag);
+  const patternStyle =
+    d.patternType === "slippery"
+      ? {
+          backgroundImage: `repeating-linear-gradient(90deg, #ffcc00, #ffcc00 4px, #dc2626 4px, #dc2626 8px)`,
+        }
+      : d.patternType === "chequered"
+        ? {
+            backgroundImage: `repeating-conic-gradient(#0f172a 0% 25%, #f8fafc 0% 50%)`,
+            backgroundSize: "6px 6px",
+          }
+        : d.patternType === "double-yellow"
+          ? {
+              background: "linear-gradient(135deg, #ffcc00 50%, #000000 50%)",
+            }
+          : undefined;
+
   return (
     <div
-      className={`flex h-10 sm:h-12 w-6 sm:w-7 items-center justify-center rounded ${d.bg} ${d.fg}`}
+      style={patternStyle}
+      className={`flex h-10 sm:h-12 w-6 sm:w-7 items-center justify-center rounded overflow-hidden relative ${d.bg} ${d.fg}`}
       title={d.label}
     >
-      <span className="rotate-90 whitespace-nowrap text-[7px] sm:text-[8px] font-bold tracking-widest">
+      <span className="rotate-90 whitespace-nowrap text-[7px] sm:text-[8px] font-bold tracking-widest bg-slate-950/75 text-white px-0.5 rounded">
         {d.label}
       </span>
     </div>
@@ -523,14 +570,43 @@ function LcdScreen({
       </div>
       {/* Main readout */}
       <div
-        className={`flex flex-1 flex-col items-center justify-center rounded text-center ${cur.bg} ${cur.fg} ${cur.flashing ? "animate-flag-flash" : ""}`}
+        style={
+          cur.patternType === "slippery"
+            ? {
+                backgroundImage: `repeating-linear-gradient(90deg, #ffcc00, #ffcc00 14px, #dc2626 14px, #dc2626 28px)`,
+              }
+            : cur.patternType === "chequered"
+              ? {
+                  backgroundImage: `repeating-conic-gradient(#0f172a 0% 25%, #f8fafc 0% 50%)`,
+                  backgroundSize: "16px 16px",
+                }
+              : cur.patternType === "double-yellow"
+                ? {
+                    background: "linear-gradient(135deg, #ffcc00 50%, #000000 50%)",
+                  }
+                : undefined
+        }
+        className={`flex flex-1 flex-col items-center justify-center rounded text-center p-2 relative overflow-hidden ${cur.bg} ${cur.fg} ${cur.flashing ? "animate-flag-flash" : ""}`}
       >
-        <span className="text-[9px] uppercase tracking-widest opacity-70">
-          {isLocal ? "Local" : isAutoGreen ? "Auto" : "—"}
-        </span>
-        <span className="text-base font-extrabold leading-tight">
-          {cur.label}
-        </span>
+        {cur.patternType ? (
+          <div className="flex flex-col items-center justify-center rounded bg-slate-950/85 px-3 py-1 backdrop-blur-sm border border-white/20">
+            <span className="text-[9px] uppercase tracking-widest text-slate-300">
+              {isLocal ? "Local" : isAutoGreen ? "Auto" : "—"}
+            </span>
+            <span className="text-base font-extrabold leading-tight text-white drop-shadow">
+              {cur.label}
+            </span>
+          </div>
+        ) : (
+          <>
+            <span className="text-[9px] uppercase tracking-widest opacity-70">
+              {isLocal ? "Local" : isAutoGreen ? "Auto" : "—"}
+            </span>
+            <span className="text-base font-extrabold leading-tight">
+              {cur.label}
+            </span>
+          </>
+        )}
       </div>
       {/* LED row */}
       <div className="flex items-center justify-around text-[8px] uppercase tracking-wider">
@@ -564,14 +640,40 @@ function MiniChip({
   active?: boolean;
 }) {
   const d = describeFlag(flag);
+  const patternStyle =
+    d.patternType === "slippery"
+      ? {
+          backgroundImage: `repeating-linear-gradient(90deg, #ffcc00, #ffcc00 5px, #dc2626 5px, #dc2626 10px)`,
+        }
+      : d.patternType === "chequered"
+        ? {
+            backgroundImage: `repeating-conic-gradient(#0f172a 0% 25%, #f8fafc 0% 50%)`,
+            backgroundSize: "8px 8px",
+          }
+        : d.patternType === "double-yellow"
+          ? {
+              background: "linear-gradient(135deg, #ffcc00 50%, #000000 50%)",
+            }
+          : undefined;
+
   return (
     <div
+      style={patternStyle}
       className={`rounded px-1 py-0.5 text-[8px] font-bold ${d.bg} ${d.fg} ${
         active ? "ring-2 ring-sky-400" : ""
-      }`}
+      } relative overflow-hidden`}
     >
-      <div className="opacity-75">{label}</div>
-      <div>{d.label}</div>
+      {d.patternType ? (
+        <div className="bg-slate-950/80 rounded px-1 text-white">
+          <div className="opacity-75">{label}</div>
+          <div>{d.label}</div>
+        </div>
+      ) : (
+        <>
+          <div className="opacity-75">{label}</div>
+          <div>{d.label}</div>
+        </>
+      )}
     </div>
   );
 }
