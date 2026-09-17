@@ -63,6 +63,7 @@ enum FlagKind {
     FLAG_RAIN,
     FLAG_SC,
     FLAG_VSC,
+    FLAG_FCY,
     FLAG_CHEQUERED,
     FLAG_WHITE
 };
@@ -140,7 +141,7 @@ void drawSlippery() {
 }
 
 void drawRain() {
-    // Black background with scrolling bright cyan teardrop raindrops
+    // Black background with scrolling bright cyan teardrop raindrops tilted 45° to the left
     matrix->fillScreen(COLOR_BLACK);
     int t = (millis() / 35) % PANEL_HEIGHT;
     uint16_t cyan = matrix->color565(0, 212, 255);
@@ -153,15 +154,22 @@ void drawRain() {
         int cx = cols[i];
         int cy = (t + yOffsets[i]) % PANEL_HEIGHT;
 
-        // Bulbous rounded teardrop: circular bottom with pointed top
-        matrix->fillCircle(cx, cy, 5, cyan);
-        matrix->fillTriangle(cx - 5, cy, cx + 5, cy, cx, cy - 8, cyan);
+        // Bulbous rounded base at bottom-right, pointed tip pointing top-left (45° angle)
+        matrix->fillCircle(cx + 2, cy + 2, 4, cyan);
+        matrix->fillTriangle(cx - 1, cy + 5, cx + 5, cy - 1, cx - 6, cy - 6, cyan);
+    }
+}
+
+void drawYellowFrame() {
+    for (int i = 0; i < 3; i++) {
+        matrix->drawRect(i, i, PANEL_WIDTH - 2 * i, PANEL_HEIGHT - 2 * i, COLOR_YELLOW);
     }
 }
 
 void drawSafetyCar() {
-    // Full yellow square background with white "SC" font, no subtitles
-    matrix->fillScreen(COLOR_YELLOW);
+    // Black background with thick yellow frame and white "SC" font
+    matrix->fillScreen(COLOR_BLACK);
+    drawYellowFrame();
     matrix->setTextSize(3);
     matrix->setTextColor(COLOR_WHITE);
     matrix->setCursor(15, 22);
@@ -169,11 +177,23 @@ void drawSafetyCar() {
 }
 
 void drawVSC() {
+    // Black background with thick yellow frame and white "VSC" font
     matrix->fillScreen(COLOR_BLACK);
+    drawYellowFrame();
     matrix->setTextSize(2);
-    matrix->setTextColor(COLOR_YELLOW);
+    matrix->setTextColor(COLOR_WHITE);
     matrix->setCursor(14, 24);
     matrix->print("VSC");
+}
+
+void drawFCY() {
+    // Black background with thick yellow frame and white "FCY" font
+    matrix->fillScreen(COLOR_BLACK);
+    drawYellowFrame();
+    matrix->setTextSize(2);
+    matrix->setTextColor(COLOR_WHITE);
+    matrix->setCursor(14, 24);
+    matrix->print("FCY");
 }
 
 void drawChequered() {
@@ -218,6 +238,8 @@ void parseFlagMessage(const char* flagStr, const char* subStr) {
         currentFlag = FLAG_SC;
     } else if (strcmp(flagStr, "vsc") == 0) {
         currentFlag = FLAG_VSC;
+    } else if (strcmp(flagStr, "fcy") == 0 || strcmp(flagStr, "full_course_yellow") == 0) {
+        currentFlag = FLAG_FCY;
     } else if (strcmp(flagStr, "chequered") == 0) {
         currentFlag = FLAG_CHEQUERED;
     } else if (strcmp(flagStr, "white") == 0) {
@@ -343,6 +365,7 @@ void loop() {
         case FLAG_RAIN:          drawRain(); break;
         case FLAG_SC:            drawSafetyCar(); break;
         case FLAG_VSC:           drawVSC(); break;
+        case FLAG_FCY:           drawFCY(); break;
         case FLAG_CHEQUERED:     drawChequered(); break;
         case FLAG_WHITE:         drawWhite(); break;
     }

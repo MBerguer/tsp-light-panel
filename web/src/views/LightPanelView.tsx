@@ -301,7 +301,7 @@ function RainDropSvg({ className = "", style = {} }: { className?: string; style
     <div className={`absolute -translate-x-1/2 -translate-y-1/2 ${className}`} style={style}>
       <svg
         viewBox="0 0 100 142"
-        className="w-[28vmin] h-[40vmin] drop-shadow-[0_0_16px_rgba(0,212,255,0.75)]"
+        className="w-[28vmin] h-[40vmin] -rotate-45 drop-shadow-[0_0_16px_rgba(0,212,255,0.75)]"
       >
         <path
           d="M 50 8 C 56 35 88 75 88 104 A 38 38 0 1 1 12 104 C 12 75 44 35 50 8 Z"
@@ -351,6 +351,34 @@ function RainDropsCanvas() {
 }
 
 // ============================================================================
+// Official Yellow-Framed High-Visibility Signal (SC, VSC, FCY)
+// Black background, bold white typography, thick yellow LED border frame
+// ============================================================================
+
+function YellowFramedSignal({ text }: { text: string }) {
+  const fontSize =
+    text.length <= 2
+      ? "text-[38vmin]"
+      : text.length <= 3
+        ? "text-[28vmin]"
+        : "text-[18vmin]";
+
+  return (
+    <div className="relative flex h-full w-full items-center justify-center bg-black p-[2.5vmin] select-none">
+      {/* Authentic Yellow LED Frame (Recuadro Amarillo) */}
+      <div className="flex h-full w-full items-center justify-center border-[3.2vmin] border-[#ffcc00] shadow-[0_0_24px_rgba(255,204,0,0.45)]">
+        {/* White Centered Text (Letras Blancas) */}
+        <span
+          className={`${fontSize} font-black text-white font-mono leading-none tracking-wider text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]`}
+        >
+          {text}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // Internal Screen Renderers: Replicates real FIA Digi-Flag Visual Output
 // ZERO text or emojis on solid flags; pure colors and high-contrast signals
 // ============================================================================
@@ -386,31 +414,13 @@ function PanelFlagCanvas({ flag, panelId }: { flag: FlagState; panelId: number }
       return <RainDropsCanvas />;
 
     case "safety_car":
-      return (
-        <div className="flex h-full w-full items-center justify-center bg-[#ffcc00] select-none">
-          <span className="text-[38vmin] font-black text-white leading-none tracking-tight">
-            SC
-          </span>
-        </div>
-      );
+      return <YellowFramedSignal text="SC" />;
 
     case "virtual_safety_car":
-      return (
-        <div className="flex h-full w-full items-center justify-center bg-black select-none">
-          <span className="text-[32vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider">
-            VSC
-          </span>
-        </div>
-      );
+      return <YellowFramedSignal text="VSC" />;
 
     case "vsc_ending":
-      return (
-        <div className="flex h-full w-full items-center justify-center bg-black select-none">
-          <span className="text-[22vmin] font-black text-[#00e600] font-mono leading-none tracking-wider">
-            VSC END
-          </span>
-        </div>
-      );
+      return <YellowFramedSignal text="VSC END" />;
 
     case "chequered":
       return (
@@ -449,13 +459,7 @@ function PanelFlagCanvas({ flag, panelId }: { flag: FlagState; panelId: number }
       );
 
     case "full_course_yellow":
-      return (
-        <div className="flex h-full w-full items-center justify-center bg-black select-none">
-          <span className="text-[30vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider">
-            FCY
-          </span>
-        </div>
-      );
+      return <YellowFramedSignal text="FCY" />;
 
     case "slow_zone":
       return (
