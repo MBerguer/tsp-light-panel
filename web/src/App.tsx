@@ -8,6 +8,7 @@ import { ReplayView } from "@/views/Replay";
 import { EditorView } from "@/views/Editor";
 import { LoginView } from "@/views/LoginView";
 import { LightPanelView } from "@/views/LightPanelView";
+import { useMylapsTiming } from "@/components/TimingBar";
 import type { ClientRole } from "@/types/ClientRole";
 import { safeRandomUUID, safeStorageGet, safeStorageSet } from "@/lib/uuid";
 
@@ -142,11 +143,12 @@ function Header({
   tab: TabId;
   setTab: (t: TabId) => void;
   role: ClientRole;
-  mode: "track" | "demo";
+  mode: string;
   userName: string | null;
   onLogout: () => void;
   authRequired: boolean;
 }) {
+  const timing = useMylapsTiming();
   const statusColour =
     status === "open"
       ? "text-emerald-400"
@@ -178,6 +180,13 @@ function Header({
           <span className={`font-mono text-xs font-bold uppercase ${statusColour}`} title={`WS status: ${status}`}>
             ● <span className="hidden sm:inline">{status}</span>
           </span>
+          {timing?.connected && (
+            <span className="flex items-center gap-1.5 rounded-full bg-emerald-950/70 border border-emerald-500/40 px-2.5 py-0.5 text-[11px] font-mono font-bold text-emerald-300 shadow-sm" title={`MYLAPS Orbits: ${timing.session_name}`}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>MYLAPS: Vta {timing.current_lap}/{timing.total_laps}</span>
+              {timing.leader_car && <span className="text-white hidden md:inline">· #{timing.leader_car}</span>}
+            </span>
+          )}
           {userName && (
             <span className="rounded bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 text-[11px] font-semibold text-sky-300">
               {userName}

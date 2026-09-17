@@ -25,11 +25,7 @@ export interface MylapsSessionState {
   last_update: string;
 }
 
-interface TimingBarProps {
-  onDeployChequered?: () => void;
-}
-
-export function TimingBar({ onDeployChequered }: TimingBarProps) {
+export function useMylapsTiming() {
   const [timing, setTiming] = useState<MylapsSessionState | null>(null);
 
   useEffect(() => {
@@ -56,6 +52,16 @@ export function TimingBar({ onDeployChequered }: TimingBarProps) {
       clearInterval(interval);
     };
   }, []);
+
+  return timing;
+}
+
+interface TimingBarProps {
+  onDeployChequered?: () => void;
+}
+
+export function TimingBar({ onDeployChequered }: TimingBarProps) {
+  const timing = useMylapsTiming();
 
   if (!timing) return null;
 

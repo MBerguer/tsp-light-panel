@@ -15,16 +15,16 @@ const PORT = process.env.MYLAPS_PORT || 50000;
 
 // Drivers from the AUVO C2 race sheet
 const DRIVERS = [
-  { num: "29", first: "Ignacio", last: "Effinger", class: "Turismo AUVO C2", best: "2:06.309", last: "2:06.884" },
-  { num: "11", first: "Dario", last: "Silva", class: "Turismo AUVO C2", best: "2:06.289", last: "2:06.440" },
-  { num: "46", first: "Richard", last: "Barbachan", class: "Turismo AUVO C2", best: "2:07.553", last: "2:08.950" },
-  { num: "591", first: "Agustin", last: "Caissutti", class: "Turismo AUVO C2", best: "2:07.882", last: "2:09.477" },
-  { num: "94", first: "Sergio", last: "Patpatian", class: "Turismo AUVO C2", best: "2:08.033", last: "2:08.907" },
-  { num: "55", first: "Luis", last: "Laureiro", class: "Turismo AUVO C2", best: "2:07.780", last: "2:08.681" },
-  { num: "14", first: "Nicolas", last: "Gerpe", class: "Turismo AUVO C2", best: "2:07.780", last: "2:09.109" },
-  { num: "16", first: "Carlo", last: "Esposito", class: "Turismo AUVO C2", best: "2:08.837", last: "2:11.100" },
-  { num: "23", first: "Diego", last: "Amaya", class: "Turismo AUVO C2", best: "2:07.011", last: "2:08.922" },
-  { num: "24", first: "Alejandro", last: "Gonzalez", class: "Turismo AUVO C2", best: "2:09.183", last: "2:09.183" }
+  { num: "29", first: "Ignacio", last: "Effinger", class: "Turismo AUVO C2", best: "2:06.309", lastLap: "2:06.884" },
+  { num: "11", first: "Dario", last: "Silva", class: "Turismo AUVO C2", best: "2:06.289", lastLap: "2:06.440" },
+  { num: "46", first: "Richard", last: "Barbachan", class: "Turismo AUVO C2", best: "2:07.553", lastLap: "2:08.950" },
+  { num: "591", first: "Agustin", last: "Caissutti", class: "Turismo AUVO C2", best: "2:07.882", lastLap: "2:09.477" },
+  { num: "94", first: "Sergio", last: "Patpatian", class: "Turismo AUVO C2", best: "2:08.033", lastLap: "2:08.907" },
+  { num: "55", first: "Luis", last: "Laureiro", class: "Turismo AUVO C2", best: "2:07.780", lastLap: "2:08.681" },
+  { num: "14", first: "Nicolas", last: "Gerpe", class: "Turismo AUVO C2", best: "2:07.780", lastLap: "2:09.109" },
+  { num: "16", first: "Carlo", last: "Esposito", class: "Turismo AUVO C2", best: "2:08.837", lastLap: "2:11.100" },
+  { num: "23", first: "Diego", last: "Amaya", class: "Turismo AUVO C2", best: "2:07.011", lastLap: "2:08.922" },
+  { num: "24", first: "Alejandro", last: "Gonzalez", class: "Turismo AUVO C2", best: "2:09.183", lastLap: "2:09.183" }
 ];
 
 const clients = new Set();
@@ -87,7 +87,7 @@ setInterval(() => {
   // Send Leaderboard ($G records)
   DRIVERS.forEach((driver, idx) => {
     const pos = idx + 1;
-    broadcast(`$G,${pos},"${driver.num}",${currentLap},"13:${Math.floor(elapsedSeconds / 60)}:${elapsedSeconds % 60}","${driver.best}","${driver.last}"`);
+    broadcast(`$G,${pos},"${driver.num}",${currentLap},"13:${Math.floor(elapsedSeconds / 60)}:${elapsedSeconds % 60}","${driver.best}","${driver.lastLap}"`);
   });
 
   // Advance lap every 10 seconds in demo mode
