@@ -141,7 +141,7 @@ void drawSlippery() {
 }
 
 void drawRain() {
-    // Black background with scrolling bright cyan teardrop raindrops tilted 45° to the left
+    // Black background with scrolling bright cyan perpendicular teardrop raindrops
     matrix->fillScreen(COLOR_BLACK);
     int t = (millis() / 35) % PANEL_HEIGHT;
     uint16_t cyan = matrix->color565(0, 212, 255);
@@ -154,9 +154,9 @@ void drawRain() {
         int cx = cols[i];
         int cy = (t + yOffsets[i]) % PANEL_HEIGHT;
 
-        // Bulbous rounded base at bottom-right, pointed tip pointing top-left (45° angle)
-        matrix->fillCircle(cx + 2, cy + 2, 4, cyan);
-        matrix->fillTriangle(cx - 1, cy + 5, cx + 5, cy - 1, cx - 6, cy - 6, cyan);
+        // Bulbous rounded teardrop: circular bottom with pointed vertical top
+        matrix->fillCircle(cx, cy, 5, cyan);
+        matrix->fillTriangle(cx - 5, cy, cx + 5, cy, cx, cy - 8, cyan);
     }
 }
 

@@ -11,7 +11,7 @@ export interface FlagDisplay {
   label: string;
   subLabel?: string;
   icon?: string;
-  patternType?: "double-yellow" | "rain" | "chequered" | "slippery" | "vsc" | "code60";
+  patternType?: "double-yellow" | "rain" | "chequered" | "slippery" | "vsc" | "code60" | "sc" | "fcy" | "vsc_ending";
   flashing: boolean;
   urgent?: boolean;
 }
@@ -59,7 +59,7 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "blue":
       return {
-        bg: "bg-blue-600 border-blue-400",
+        bg: "bg-blue-600 border-2 border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]",
         fg: "text-white",
         label: "BLUE",
         subLabel: "CEDER PASO",
@@ -87,7 +87,7 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "rain":
       return {
-        bg: "bg-gradient-to-b from-sky-600 via-sky-700 to-blue-800 border-sky-400",
+        bg: "bg-black border-2 border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.4)]",
         fg: "text-white",
         label: "RAIN",
         subLabel: "PISTA HÚMEDA",
@@ -117,18 +117,19 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "safety_car":
       return {
-        bg: "bg-amber-500 border-amber-400",
-        fg: "text-slate-950",
+        bg: "bg-black border-2 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.4)]",
+        fg: "text-white",
         label: "SC",
         subLabel: "SAFETY CAR",
         icon: "🚨",
+        patternType: "sc",
         flashing: true,
         urgent: true,
       };
     case "virtual_safety_car":
       return {
-        bg: "bg-slate-950 border-2 border-amber-400",
-        fg: "text-amber-300",
+        bg: "bg-black border-2 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.4)]",
+        fg: "text-white",
         label: "VSC",
         subLabel: "VIRTUAL SC",
         icon: "⚡",
@@ -137,20 +138,22 @@ export function describeFlag(flag: FlagState): FlagDisplay {
       };
     case "vsc_ending":
       return {
-        bg: "bg-gradient-to-r from-amber-500 via-emerald-600 to-emerald-500 border-emerald-400",
-        fg: "text-slate-950",
+        bg: "bg-black border-2 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.4)]",
+        fg: "text-white",
         label: "VSC END",
         subLabel: "PREP REINICIO",
         icon: "⚡🟢",
+        patternType: "vsc_ending",
         flashing: true,
       };
     case "full_course_yellow":
       return {
-        bg: "bg-amber-400 border-amber-300",
-        fg: "text-slate-950",
+        bg: "bg-black border-2 border-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.4)]",
+        fg: "text-white",
         label: "FCY",
         subLabel: "80 KM/H LIMIT",
         icon: "⚠️",
+        patternType: "fcy",
         flashing: true,
       };
     case "code60":

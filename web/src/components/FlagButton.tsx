@@ -27,7 +27,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
     };
   } else if (d.patternType === "double-yellow") {
     customStyle = {
-      backgroundImage: `repeating-linear-gradient(45deg, #d97706, #d97706 8px, #000000 8px, #000000 16px)`,
+      backgroundImage: `linear-gradient(135deg, #ffcc00 50%, #000000 50%)`,
     };
   } else if (d.patternType === "slippery") {
     customStyle = {
@@ -35,7 +35,7 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
     };
   } else if (d.patternType === "rain") {
     customStyle = {
-      backgroundImage: `repeating-linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0px, rgba(56, 189, 248, 0.25) 2px, transparent 2px, transparent 10px), linear-gradient(180deg, #0369a1 0%, #0c4a6e 100%)`,
+      backgroundImage: `linear-gradient(180deg, #050b14 0%, #000000 100%)`,
     };
   }
 
@@ -68,16 +68,16 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
       )}
 
       {d.patternType === "double-yellow" && (
-        <div className="absolute inset-1 flex items-center justify-center rounded-lg bg-amber-500/95 backdrop-blur-sm p-1 shadow-inner">
+        <div className="absolute inset-1 flex items-center justify-center rounded-lg bg-black/85 backdrop-blur-sm p-1 border border-amber-400/90 shadow-inner">
           <div className="flex flex-col items-center justify-center">
             <div className="flex items-center gap-1">
               <span className="text-xs">⚠️</span>
-              <span className="text-xs font-black tracking-wider text-slate-950">
+              <span className="text-xs font-black tracking-wider text-amber-300">
                 DOUBLE YELLOW
               </span>
               <span className="text-xs">⚠️</span>
             </div>
-            <span className="text-[9px] font-extrabold uppercase tracking-tight text-amber-950">
+            <span className="text-[9px] font-extrabold uppercase tracking-tight text-amber-400">
               PELIGRO MÁXIMO
             </span>
           </div>
@@ -100,13 +100,13 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
 
       {d.patternType === "rain" && (
         <div className="flex flex-col items-center justify-center w-full">
-          {/* Animated Water Droplets */}
+          {/* Authentic vertical water drops */}
           <div className="flex items-center justify-center gap-1 mb-0.5">
             <span className="text-sm">🌧️</span>
-            <span className="inline-block animate-bounce text-sky-200 text-xs">💧</span>
-            <span className="inline-block animate-bounce delay-150 text-sky-300 text-xs">💧</span>
+            <span className="inline-block text-cyan-300 text-xs">💧</span>
+            <span className="inline-block text-cyan-200 text-xs">💧</span>
           </div>
-          <span className="text-xs sm:text-sm font-black tracking-wider text-white drop-shadow-md">
+          <span className="text-xs sm:text-sm font-black tracking-wider text-cyan-300 drop-shadow-[0_0_8px_rgba(0,212,255,0.6)]">
             RAIN
           </span>
           <span className="text-[9px] font-bold text-sky-200 uppercase tracking-tight">
@@ -117,31 +117,56 @@ export function FlagButton({ flag, onClick, disabled, active }: Props) {
 
       {flag.kind === "safety_car" && (
         <div className="flex flex-col items-center justify-center w-full">
-          {/* Strobe emergency lightbar on top */}
-          <div className="flex items-center gap-1 mb-1">
-            <span className="h-1.5 w-3.5 rounded-full bg-white animate-pulse" />
-            <span className="h-1.5 w-3.5 rounded-full bg-amber-950 animate-pulse delay-100" />
-            <span className="h-1.5 w-3.5 rounded-full bg-white animate-pulse" />
+          <div className="flex items-center gap-1 mb-0.5">
+            <span className="text-xs">🚨</span>
+            <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
+              SC
+            </span>
           </div>
-          <span className="text-sm sm:text-base font-black tracking-wider text-slate-950">
-            🚨 SC
-          </span>
-          <span className="text-[9px] font-extrabold uppercase tracking-tight text-amber-950">
+          <span className="text-[9px] font-extrabold uppercase tracking-tight text-amber-300">
             SAFETY CAR
           </span>
         </div>
       )}
 
-      {d.patternType === "vsc" && (
+      {flag.kind === "virtual_safety_car" && (
         <div className="flex flex-col items-center justify-center w-full">
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-amber-400">⚡</span>
-            <span className="text-sm sm:text-base font-black tracking-wider text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
+          <div className="flex items-center gap-1 mb-0.5">
+            <span className="text-xs text-amber-300">⚡</span>
+            <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
               VSC
             </span>
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-tight text-amber-400/80">
-            DELTA TIME
+          <span className="text-[9px] font-bold uppercase tracking-tight text-amber-300">
+            VIRTUAL SC
+          </span>
+        </div>
+      )}
+
+      {flag.kind === "vsc_ending" && (
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="flex items-center gap-1 mb-0.5">
+            <span className="text-xs">⚡🟢</span>
+            <span className="text-xs sm:text-sm font-black tracking-wider text-white font-mono drop-shadow">
+              VSC END
+            </span>
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-tight text-emerald-400">
+            PREP REINICIO
+          </span>
+        </div>
+      )}
+
+      {flag.kind === "full_course_yellow" && (
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="flex items-center gap-1 mb-0.5">
+            <span className="text-xs text-amber-300">⚠️</span>
+            <span className="text-sm sm:text-base font-black tracking-wider text-white font-mono drop-shadow">
+              FCY
+            </span>
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-tight text-amber-300">
+            80 KM/H LIMIT
           </span>
         </div>
       )}

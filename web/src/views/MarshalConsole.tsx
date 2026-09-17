@@ -196,13 +196,13 @@ export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewPr
             <div className="order-2 md:order-1 flex justify-between gap-2 sm:gap-4 md:contents">
               {/* Left column: 4 buttons + flag icons */}
               <div className="flex flex-col gap-2.5 sm:gap-3 flex-1 md:flex-none items-center md:items-start">
-                <ButtonRow side="left" variant="green" label="GREEN" flag={{ kind: "green" }}
+                <ButtonRow side="left" variant="green" label="GREEN" sub="LIBRE 🟢" flag={{ kind: "green" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "green" })} />
-                <ButtonRow side="left" variant="blue" label="BLUE" flag={{ kind: "blue" }}
+                <ButtonRow side="left" variant="blue" label="BLUE" sub="PASO 🔵" flag={{ kind: "blue" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "blue" })} />
-                <ButtonRow side="left" variant="dark" label="OFF" flag="off"
+                <ButtonRow side="left" variant="dark" label="OFF" sub="APAGAR ⚪" flag="off"
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "off" })} />
-                <ButtonRow side="left" variant="white" label="WHITE" flag={{ kind: "white" }}
+                <ButtonRow side="left" variant="white" label="WHITE" sub="LENTO ⚪" flag={{ kind: "white" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "white" })} />
               </div>
 
@@ -210,15 +210,15 @@ export function MarshalConsoleView({ onBackToRaceControl }: MarshalConsoleViewPr
               <div className="order-3 flex flex-col gap-2.5 sm:gap-3 flex-1 md:flex-none items-center md:items-end">
                 <ButtonRow side="right" variant="yellow" label="YELLOW" sub="SINGLE ⚠️" flag={{ kind: "yellow", data: "single" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow", data: "single" })} />
-                <ButtonRow side="right" variant="double_yellow" label="YELLOW" sub="DOUBLE ⚠️⚠️" flag={{ kind: "yellow", data: "double" }}
+                <ButtonRow side="right" variant="double_yellow" label="DOUBLE" sub="YELLOW ⚠️⚠️" flag={{ kind: "yellow", data: "double" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow", data: "double" })} />
-                <ButtonRow side="right" variant="dark" label="OFF" flag="off"
+                <ButtonRow side="right" variant="dark" label="OFF" sub="APAGAR ⚪" flag="off"
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "off" })} />
                 <ButtonRow
                   side="right"
                   variant="slippery"
                   label="SLIPPERY"
-                  sub="OIL · WATER"
+                  sub="OIL/WATER 🟡🔴"
                   flag={{ kind: "yellow_red_striped" }}
                   onClick={() => submit({ scope: "zone", id: post }, { kind: "yellow_red_striped" })}
                   onLongPress={() => submit({ scope: "zone", id: post }, { kind: "rain" })}
@@ -312,10 +312,10 @@ function ButtonRow({
     green: "bg-emerald-500 text-emerald-950 ring-emerald-900 hover:bg-emerald-400",
     yellow: "bg-amber-400 text-amber-950 ring-amber-900 hover:bg-amber-300",
     double_yellow:
-      "bg-amber-500 text-slate-950 ring-4 ring-amber-400/90 hover:bg-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]",
-    blue: "bg-blue-600 text-white ring-blue-400 hover:bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]",
+      "text-white ring-4 ring-amber-400 hover:brightness-110 shadow-[0_0_14px_rgba(245,158,11,0.7)]",
+    blue: "bg-blue-600 text-white ring-blue-400 hover:bg-blue-500 shadow-[0_0_12px_rgba(37,99,235,0.6)]",
     white: "bg-slate-100 text-slate-900 ring-slate-300 hover:bg-white",
-    dark: "bg-slate-800 text-slate-100 ring-slate-950 hover:bg-slate-700",
+    dark: "bg-slate-900 text-slate-200 ring-slate-800 hover:bg-slate-800",
     slippery:
       "bg-gradient-to-r from-amber-400 via-red-600 to-amber-400 text-slate-950 ring-amber-400 hover:brightness-110",
   };
@@ -382,6 +382,11 @@ function ButtonRow({
       onTouchStart={beginHold}
       onTouchEnd={cancelHold}
       onTouchCancel={cancelHold}
+      style={
+        variant === "double_yellow"
+          ? { background: "linear-gradient(135deg, #ffcc00 50%, #000000 50%)" }
+          : undefined
+      }
       className={`relative flex h-14 sm:h-16 w-20 sm:w-24 flex-col items-center justify-center overflow-hidden rounded-full px-1.5 sm:px-2 ring-2 sm:ring-4 shadow-inner active:translate-y-px ${palette[variant]}`}
       title={longPressLabel ?? label}
     >
@@ -393,9 +398,11 @@ function ButtonRow({
           style={{ height: `${pct}%` }}
         />
       )}
-      <span className="relative text-xs sm:text-sm font-extrabold tracking-wider">{label}</span>
+      <span className="relative text-xs sm:text-sm font-black tracking-wider drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+        {label}
+      </span>
       {sub && (
-        <span className="relative text-[8px] sm:text-[9px] font-bold uppercase opacity-80">
+        <span className="relative text-[8px] sm:text-[9px] font-bold uppercase opacity-90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
           {sub}
         </span>
       )}

@@ -301,7 +301,7 @@ function RainDropSvg({ className = "", style = {} }: { className?: string; style
     <div className={`absolute -translate-x-1/2 -translate-y-1/2 ${className}`} style={style}>
       <svg
         viewBox="0 0 100 142"
-        className="w-[28vmin] h-[40vmin] -rotate-45 drop-shadow-[0_0_16px_rgba(0,212,255,0.75)]"
+        className="w-[28vmin] h-[40vmin] drop-shadow-[0_0_16px_rgba(0,212,255,0.75)]"
       >
         <path
           d="M 50 8 C 56 35 88 75 88 104 A 38 38 0 1 1 12 104 C 12 75 44 35 50 8 Z"
