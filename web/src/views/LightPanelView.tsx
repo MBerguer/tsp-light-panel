@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
-import { describeFlag } from "@/lib/flag";
 import type { FlagState } from "@/types/FlagState";
 
 interface Props {
@@ -57,7 +56,6 @@ export function LightPanelView({
   // Current effective flag state for this panel
   const panel = panels[panelId];
   const flagState: FlagState = panel?.effective_state ?? { kind: "off" };
-  const flagDisplay = describeFlag(flagState);
 
   // Keep screen awake via Wake Lock API
   useEffect(() => {
@@ -245,15 +243,108 @@ export function LightPanelView({
       </div>
 
       {/* Corner Telemetry Watermark (Dim heartbeat indicator so marshals know panel is live) */}
-      <div className="pointer-events-none absolute bottom-2 right-3 z-40 flex items-center gap-2 font-mono text-[10px] text-slate-500/50">
+      <div className="pointer-events-none absolute bottom-2 right-3 z-40 flex items-center gap-2 font-mono text-[10px] text-slate-500/40">
         <span
           className={`h-1.5 w-1.5 rounded-full ${
-            status === "open" ? "bg-emerald-500/70" : "bg-red-500/70"
+            status === "open" ? "bg-emerald-500/60" : "bg-red-500/60"
           }`}
         />
         <span>POST #{panelId < 10 ? `0${panelId}` : panelId}</span>
-        <span>·</span>
-        <span>{flagDisplay.label}</span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Double Yellow: Rapidly Alternating Diagonal Split Triangles (~3 Hz)
+// ============================================================================
+
+function DoubleYellowCanvas() {
+  const [phase, setPhase] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPhase((p) => !p);
+    }, 180);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-black select-none">
+      {/* Top-Right Triangle */}
+      <div
+        className="absolute inset-0 transition-none"
+        style={{
+          clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+          backgroundColor: phase ? "#ffcc00" : "#000000",
+        }}
+      />
+      {/* Bottom-Left Triangle */}
+      <div
+        className="absolute inset-0 transition-none"
+        style={{
+          clipPath: "polygon(0 0, 0 100%, 100% 100%)",
+          backgroundColor: phase ? "#000000" : "#ffcc00",
+        }}
+      />
+    </div>
+  );
+}
+
+// ============================================================================
+// Rain Flag: Authentic Downward Scrolling Teardrop Water Droplets
+// Replicates physical trackside LED panel (pointed top, round bulbous bottom)
+// ============================================================================
+
+function RainDropSvg({ className = "", style = {} }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <div className={`absolute -translate-x-1/2 -translate-y-1/2 ${className}`} style={style}>
+      <svg
+        viewBox="0 0 100 142"
+        className="w-[28vmin] h-[40vmin] drop-shadow-[0_0_16px_rgba(0,212,255,0.75)]"
+      >
+        <path
+          d="M 50 8 C 56 35 88 75 88 104 A 38 38 0 1 1 12 104 C 12 75 44 35 50 8 Z"
+          fill="#00d4ff"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function RainPatternBlock() {
+  return (
+    <div className="relative w-full h-1/2">
+      {/* Upper center drop */}
+      <RainDropSvg style={{ left: "50%", top: "28%" }} />
+      {/* Lower left & right drops */}
+      <RainDropSvg style={{ left: "20%", top: "78%" }} />
+      <RainDropSvg style={{ left: "80%", top: "78%" }} />
+    </div>
+  );
+}
+
+function RainDropsCanvas() {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-black select-none">
+      <style>{`
+        @keyframes rainScrollDown {
+          0% {
+            transform: translateY(-50%);
+          }
+          100% {
+            transform: translateY(0%);
+          }
+        }
+        .rain-scroll-track {
+          animation: rainScrollDown 2.2s linear infinite;
+        }
+      `}</style>
+      <div className="rain-scroll-track absolute left-0 top-0 w-full h-[200%] flex flex-col pointer-events-none">
+        {/* Block 1 (top 50% = 1 screen height) */}
+        <RainPatternBlock />
+        {/* Block 2 (bottom 50% = 1 screen height, identical duplicate for seamless loop) */}
+        <RainPatternBlock />
       </div>
     </div>
   );
@@ -261,262 +352,168 @@ export function LightPanelView({
 
 // ============================================================================
 // Internal Screen Renderers: Replicates real FIA Digi-Flag Visual Output
+// ZERO text or emojis on solid flags; pure colors and high-contrast signals
 // ============================================================================
 
 function PanelFlagCanvas({ flag, panelId }: { flag: FlagState; panelId: number }) {
   switch (flag.kind) {
     case "off":
       return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-black text-slate-700">
-          <div className="flex flex-col items-center gap-2 opacity-30">
-            <span className="font-mono text-5xl font-black">
-              #{panelId < 10 ? `0${panelId}` : panelId}
-            </span>
-            <span className="font-mono text-xs uppercase tracking-widest">
-              STANDBY · SYSTEM READY
-            </span>
-          </div>
+        <div className="flex h-full w-full flex-col items-center justify-center bg-black text-slate-800 select-none">
+          <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+            #{panelId < 10 ? `0${panelId}` : panelId} · OFF
+          </span>
         </div>
       );
 
     case "green":
-      return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-[#00e65b] text-slate-950">
-          {/* Authentic full-screen ultra-bright racing green */}
-          <div className="flex flex-col items-center justify-center">
-            <span className="text-[15vmin] font-black tracking-wider leading-none">
-              GREEN
-            </span>
-            <span className="text-[4vmin] font-extrabold uppercase tracking-widest opacity-90 mt-2">
-              TRACK CLEAR
-            </span>
-          </div>
-        </div>
-      );
+      return <div className="h-full w-full bg-[#00e600]" />;
 
     case "yellow":
       if (flag.data === "double") {
-        return (
-          <div
-            className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-amber-500"
-            style={{
-              backgroundImage: `repeating-linear-gradient(45deg, #f59e0b, #f59e0b 6vmin, #000000 6vmin, #000000 12vmin)`,
-            }}
-          >
-            {/* Center High-Contrast Hazard Plaque */}
-            <div className="z-10 flex flex-col items-center justify-center rounded-3xl bg-slate-950/95 p-[4vmin] border-[1vmin] border-amber-400 shadow-2xl">
-              <div className="flex items-center gap-[2vmin]">
-                <span className="text-[8vmin]">⚠️</span>
-                <span className="text-[10vmin] font-black tracking-wider text-amber-400 leading-none">
-                  DOUBLE
-                </span>
-                <span className="text-[8vmin]">⚠️</span>
-              </div>
-              <span className="text-[7vmin] font-black tracking-tight text-amber-300">
-                YELLOW
-              </span>
-              <span className="text-[3vmin] font-black uppercase tracking-widest text-amber-400/90 mt-1">
-                GREAT DANGER · SLOW DOWN
-              </span>
-            </div>
-          </div>
-        );
+        return <DoubleYellowCanvas />;
       }
-
-      // Single Yellow
-      return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-[#ffcc00] text-slate-950 p-6">
-          <div className="flex flex-col items-center justify-center text-center">
-            <span className="text-[18vmin] leading-none mb-2">⚠️</span>
-            <span className="text-[13vmin] font-black tracking-wider leading-none">
-              YELLOW
-            </span>
-            <span className="text-[4vmin] font-extrabold uppercase tracking-widest text-slate-950/90 mt-2">
-              CAUTION · NO OVERTAKING
-            </span>
-          </div>
-        </div>
-      );
+      return <div className="h-full w-full bg-[#ffcc00]" />;
 
     case "blue":
-      return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-[#0055ff] text-white p-6">
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-[3vmin] mb-2">
-              <span className="text-[16vmin] leading-none">⇥</span>
-              <span className="text-[14vmin] font-black tracking-wider leading-none">
-                BLUE
-              </span>
-            </div>
-            <span className="text-[4.5vmin] font-black uppercase tracking-widest text-sky-200">
-              GIVE WAY · OVERTAKE
-            </span>
-          </div>
-        </div>
-      );
+    case "custom_blue":
+      return <div className="h-full w-full bg-[#0055ff]" />;
 
     case "red":
-      return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-[#ff0022] text-white p-6">
-          <div className="flex flex-col items-center justify-center text-center">
-            <span className="text-[16vmin] leading-none mb-2">🚩</span>
-            <span className="text-[14vmin] font-black tracking-wider leading-none">
-              RED FLAG
-            </span>
-            <span className="text-[4vmin] font-black uppercase tracking-widest text-white/95 mt-2">
-              STOP · RETURN TO PIT
-            </span>
-          </div>
-        </div>
-      );
+      return <div className="h-full w-full bg-[#ff0000]" />;
 
     case "rain":
-      return (
-        <div
-          className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-sky-700 text-white p-6"
-          style={{
-            backgroundImage: `repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0px, rgba(255, 255, 255, 0.15) 3px, transparent 3px, transparent 18px), linear-gradient(180deg, #0284c7 0%, #0369a1 100%)`,
-          }}
-        >
-          <div className="z-10 flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-[2vmin] mb-2">
-              <span className="text-[12vmin]">🌧️</span>
-              <span className="text-[8vmin] text-sky-200">💧</span>
-              <span className="text-[10vmin] text-sky-100">💧</span>
-            </div>
-            <span className="text-[14vmin] font-black tracking-wider leading-none drop-shadow-lg">
-              RAIN
-            </span>
-            <span className="text-[4.5vmin] font-black uppercase tracking-widest text-sky-200 mt-2">
-              WET TRACK · LOW GRIP
-            </span>
-          </div>
-        </div>
-      );
-
-    case "yellow_red_striped":
-      return (
-        <div
-          className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
-          style={{
-            backgroundImage: `repeating-linear-gradient(90deg, #eab308, #eab308 10vmin, #dc2626 10vmin, #dc2626 20vmin)`,
-          }}
-        >
-          <div className="z-10 rounded-3xl bg-slate-950/90 border-[1vmin] border-amber-400 p-[5vmin] text-center shadow-2xl">
-            <span className="text-[10vmin] font-black tracking-wider text-amber-300 leading-none">
-              SLIPPERY
-            </span>
-            <span className="block text-[4vmin] font-bold text-slate-200 uppercase tracking-widest mt-2">
-              OIL · WATER · DEBRIS
-            </span>
-          </div>
-        </div>
-      );
+      return <RainDropsCanvas />;
 
     case "safety_car":
       return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-[#ff8800] text-slate-950 p-6">
-          {/* Alternating Emergency Strobe Lightbar on top */}
-          <div className="absolute top-[5vmin] flex items-center gap-[2vmin]">
-            <span className="h-[3vmin] w-[10vmin] rounded-full bg-white shadow-[0_0_15px_#fff]" />
-            <span className="h-[3vmin] w-[10vmin] rounded-full bg-slate-950 shadow-[0_0_15px_#000]" />
-            <span className="h-[3vmin] w-[10vmin] rounded-full bg-white shadow-[0_0_15px_#fff]" />
-          </div>
-
-          <div className="flex flex-col items-center justify-center text-center mt-[4vmin]">
-            <span className="text-[22vmin] font-black tracking-widest leading-none">
-              SC
-            </span>
-            <span className="text-[5vmin] font-black uppercase tracking-widest text-amber-950">
-              SAFETY CAR DEPLOYED
-            </span>
-          </div>
+        <div className="flex h-full w-full items-center justify-center bg-[#ffcc00] select-none">
+          <span className="text-[38vmin] font-black text-white leading-none tracking-tight">
+            SC
+          </span>
         </div>
       );
 
     case "virtual_safety_car":
       return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-[#050811] text-amber-400 p-6 border-[2vmin] border-amber-400">
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-[2vmin]">
-              <span className="text-[12vmin] text-amber-400">⚡</span>
-              <span className="text-[20vmin] font-black tracking-widest leading-none font-mono text-amber-300 drop-shadow-[0_0_20px_rgba(251,191,36,0.6)]">
-                VSC
-              </span>
-            </div>
-            <span className="text-[4.5vmin] font-black uppercase tracking-widest text-amber-400 mt-2">
-              VIRTUAL SAFETY CAR · DELTA
-            </span>
-          </div>
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[32vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider">
+            VSC
+          </span>
         </div>
       );
 
     case "vsc_ending":
       return (
-        <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-r from-amber-500 via-emerald-500 to-emerald-600 text-slate-950 p-6">
-          <div className="flex flex-col items-center justify-center text-center">
-            <span className="text-[18vmin] font-black tracking-wider leading-none">
-              VSC END
-            </span>
-            <span className="text-[4.5vmin] font-black uppercase tracking-widest text-slate-950/90 mt-3">
-              PREPARE TO RESUME RACING
-            </span>
-          </div>
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[22vmin] font-black text-[#00e600] font-mono leading-none tracking-wider">
+            VSC END
+          </span>
         </div>
       );
 
     case "chequered":
       return (
         <div
-          className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden"
+          className="h-full w-full"
           style={{
             backgroundImage: `repeating-conic-gradient(#000000 0% 25%, #ffffff 0% 50%)`,
             backgroundPosition: "50%",
             backgroundSize: "16vmin 16vmin",
           }}
-        >
-          <div className="z-10 rounded-3xl bg-slate-950/90 border-[1vmin] border-white p-[5vmin] text-center shadow-2xl">
-            <span className="text-[10vmin]">🏁</span>
-            <span className="block text-[12vmin] font-black tracking-wider text-white leading-none mt-1">
-              FINISH
-            </span>
-            <span className="block text-[3.5vmin] font-bold text-slate-300 uppercase tracking-widest mt-2">
-              CHEQUERED FLAG · SESSION END
-            </span>
-          </div>
-        </div>
+        />
+      );
+
+    case "yellow_red_striped":
+      return (
+        <div
+          className="h-full w-full"
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, #ffcc00 0, #ffcc00 8vmin, #dc2626 8vmin, #dc2626 16vmin)`,
+          }}
+        />
       );
 
     case "white":
-      return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-white text-slate-900 p-6">
-          <div className="flex flex-col items-center justify-center text-center">
-            <span className="text-[16vmin] leading-none mb-2">🚗💨</span>
-            <span className="text-[14vmin] font-black tracking-wider leading-none">
-              WHITE
-            </span>
-            <span className="text-[4vmin] font-black uppercase tracking-widest text-slate-700 mt-2">
-              SLOW VEHICLE ON TRACK
-            </span>
-          </div>
-        </div>
-      );
+      return <div className="h-full w-full bg-[#ffffff]" />;
 
     case "code60":
       return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-white p-6">
-          {/* Regulatory Speed Limit Disc */}
-          <div className="flex h-[75vmin] w-[75vmin] items-center justify-center rounded-full border-[6vmin] border-red-600 bg-white shadow-2xl">
-            <span className="text-[34vmin] font-black tracking-tighter text-slate-950 font-mono">
+        <div className="flex h-full w-full items-center justify-center bg-white p-6 select-none">
+          <div className="flex h-[75vmin] w-[75vmin] items-center justify-center rounded-full border-[6vmin] border-[#dc2626] bg-white">
+            <span className="text-[34vmin] font-black tracking-tighter text-black font-mono leading-none">
               60
             </span>
           </div>
         </div>
       );
 
+    case "full_course_yellow":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[30vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider">
+            FCY
+          </span>
+        </div>
+      );
+
+    case "slow_zone":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[32vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider">
+            SZ
+          </span>
+        </div>
+      );
+
+    case "next_slow":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[20vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wide text-center">
+            NEXT SLOW
+          </span>
+        </div>
+      );
+
+    case "pit_entry_open":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-[#00e600] select-none">
+          <span className="text-[20vmin] font-black text-black leading-none tracking-wider text-center">
+            PIT OPEN
+          </span>
+        </div>
+      );
+
+    case "pit_entry_closed":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-[#ff0000] select-none">
+          <span className="text-[18vmin] font-black text-white leading-none tracking-wider text-center">
+            PIT CLOSED
+          </span>
+        </div>
+      );
+
+    case "standing_start":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[20vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider text-center">
+            START
+          </span>
+        </div>
+      );
+
+    case "rolling_start":
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-black select-none">
+          <span className="text-[20vmin] font-black text-[#ffcc00] font-mono leading-none tracking-wider text-center">
+            ROLL START
+          </span>
+        </div>
+      );
+
     default:
       return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-slate-900 text-slate-200 p-6">
+        <div className="flex h-full w-full items-center justify-center bg-black text-slate-500 select-none">
           <span className="text-[12vmin] font-black tracking-wider">
             {flag.kind.toUpperCase()}
           </span>

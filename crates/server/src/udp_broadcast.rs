@@ -50,7 +50,7 @@ pub fn flag_to_strings(flag: FlagState) -> (String, Option<String>) {
             };
             ("yellow".into(), Some(sub.into()))
         }
-        FlagState::Blue => ("blue".into(), None),
+        FlagState::Blue | FlagState::CustomBlue => ("blue".into(), None),
         FlagState::White => ("white".into(), None),
         FlagState::YellowRedStriped => ("slippery".into(), None),
         FlagState::Rain => ("rain".into(), None),
@@ -134,9 +134,7 @@ pub fn spawn_udp_broadcaster(world: Arc<World>, target: SocketAddr) {
                     };
 
                     if let Ok(bytes) = serde_json::to_vec(&packet) {
-                        if let Err(e) = socket.send_to(&bytes, target).await {
-                            eprintln!("Error sending UDP packet: {:?}", e);
-                        }
+                        let _ = socket.send_to(&bytes, target).await;
                     }
                 }
             }

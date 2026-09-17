@@ -571,17 +571,30 @@ function Led({ on, label, warn }: { on: boolean; label: string; warn?: boolean }
 function useMarshalCommand(role: ClientRole) {
   const client = useStore((s) => s.client);
   return (target: CommandTarget, flag: FlagState) => {
-    if (!client || role.role !== "marshal") return;
-    client.send({
-      type: "submit_command",
-      command: {
-        id: safeRandomUUID(),
-        source: { kind: "marshal", data: { post: role.data.post } },
-        target,
-        flag,
-        timestamp: new Date().toISOString(),
-      },
-    });
+    if (!client) return;
+    if (role.role === "marshal") {
+      client.send({
+        type: "submit_command",
+        command: {
+          id: safeRandomUUID(),
+          source: { kind: "marshal", data: { post: role.data.post } },
+          target,
+          flag,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } else if (role.role === "race_control") {
+      client.send({
+        type: "submit_command",
+        command: {
+          id: safeRandomUUID(),
+          source: { kind: "race_control", data: { operator: role.data.operator } },
+          target,
+          flag,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
   };
 }
 

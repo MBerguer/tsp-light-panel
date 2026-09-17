@@ -106,17 +106,14 @@ void drawYellowSingle() {
 }
 
 void drawYellowDouble() {
-    // Double yellow: 45° animated hazard stripes (racing chevrons)
-    int offset = (millis() / 60) % 16;
-    for (int y = 0; y < PANEL_HEIGHT; y++) {
-        for (int x = 0; x < PANEL_WIDTH; x++) {
-            if (((x + y + offset) % 16) < 8) {
-                matrix->drawPixel(x, y, COLOR_YELLOW);
-            } else {
-                matrix->drawPixel(x, y, COLOR_BLACK);
-            }
-        }
-    }
+    // Double yellow: corner-to-corner diagonal split alternating triangles
+    bool phase = (millis() / 180) % 2 == 0;
+    uint16_t c1 = phase ? COLOR_YELLOW : COLOR_BLACK;
+    uint16_t c2 = phase ? COLOR_BLACK : COLOR_YELLOW;
+    // Top-right triangle
+    matrix->fillTriangle(0, 0, PANEL_WIDTH - 1, 0, PANEL_WIDTH - 1, PANEL_HEIGHT - 1, c1);
+    // Bottom-left triangle
+    matrix->fillTriangle(0, 0, 0, PANEL_HEIGHT - 1, PANEL_WIDTH - 1, PANEL_HEIGHT - 1, c2);
 }
 
 void drawRed() {
@@ -125,16 +122,8 @@ void drawRed() {
 }
 
 void drawBlue() {
-    // FIA Blue flag: bright blue with high-visibility flashing corner beacons
+    // Solid high-impact electric blue
     matrix->fillScreen(COLOR_BLUE);
-    bool flash = (millis() / 150) % 2 == 0;
-    uint16_t cornerColor = flash ? COLOR_WHITE : COLOR_BLUE;
-    
-    // 4 Corner Beacons
-    matrix->fillRect(0, 0, 10, 10, cornerColor);
-    matrix->fillRect(PANEL_WIDTH - 10, 0, 10, 10, cornerColor);
-    matrix->fillRect(0, PANEL_HEIGHT - 10, 10, 10, cornerColor);
-    matrix->fillRect(PANEL_WIDTH - 10, PANEL_HEIGHT - 10, 10, 10, cornerColor);
 }
 
 void drawSlippery() {
@@ -151,25 +140,30 @@ void drawSlippery() {
 }
 
 void drawRain() {
-    // Dark blue background with animated falling bright cyan raindrops
-    matrix->fillScreen(matrix->color565(0, 10, 50));
-    int t = millis() / 40;
-    for (int col = 0; col < PANEL_WIDTH; col += 8) {
-        int dropY = (t + col * 3) % PANEL_HEIGHT;
-        matrix->drawFastVLine(col, dropY, 6, matrix->color565(100, 200, 255));
-        matrix->drawPixel(col, (dropY + 6) % PANEL_HEIGHT, COLOR_WHITE);
+    // Black background with scrolling bright cyan teardrop raindrops
+    matrix->fillScreen(COLOR_BLACK);
+    int t = (millis() / 35) % PANEL_HEIGHT;
+    uint16_t cyan = matrix->color565(0, 212, 255);
+    
+    // 3 staggered columns of teardrops scrolling down
+    int cols[3] = {14, 32, 50};
+    int yOffsets[3] = {PANEL_HEIGHT / 2, 0, PANEL_HEIGHT / 2};
+
+    for (int i = 0; i < 3; i++) {
+        int cx = cols[i];
+        int cy = (t + yOffsets[i]) % PANEL_HEIGHT;
+
+        // Bulbous rounded teardrop: circular bottom with pointed top
+        matrix->fillCircle(cx, cy, 5, cyan);
+        matrix->fillTriangle(cx - 5, cy, cx + 5, cy, cx, cy - 8, cyan);
     }
 }
 
 void drawSafetyCar() {
-    matrix->fillScreen(COLOR_BLACK);
-    // Orange roof beacon simulation at top
-    bool beacon = (millis() / 100) % 2 == 0;
-    matrix->fillRect(0, 0, PANEL_WIDTH, 8, beacon ? COLOR_ORANGE : COLOR_BLACK);
-
-    // "SC" text centered
+    // Full yellow square background with white "SC" font, no subtitles
+    matrix->fillScreen(COLOR_YELLOW);
     matrix->setTextSize(3);
-    matrix->setTextColor(COLOR_YELLOW);
+    matrix->setTextColor(COLOR_WHITE);
     matrix->setCursor(15, 22);
     matrix->print("SC");
 }
@@ -214,7 +208,7 @@ void parseFlagMessage(const char* flagStr, const char* subStr) {
         }
     } else if (strcmp(flagStr, "red") == 0) {
         currentFlag = FLAG_RED;
-    } else if (strcmp(flagStr, "blue") == 0) {
+    } else if (strcmp(flagStr, "blue") == 0 || strcmp(flagStr, "customblue") == 0 || strcmp(flagStr, "custom_blue") == 0) {
         currentFlag = FLAG_BLUE;
     } else if (strcmp(flagStr, "slippery") == 0) {
         currentFlag = FLAG_SLIPPERY;

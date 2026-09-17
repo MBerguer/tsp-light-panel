@@ -84,7 +84,7 @@ export function RaceControlView() {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 sm:gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-2 sm:gap-2.5">
             <FlagButton
               flag={{ kind: "green" }}
               onClick={() => submit(globalTarget, { kind: "green" })}
@@ -100,6 +100,10 @@ export function RaceControlView() {
               onClick={() =>
                 submit(globalTarget, { kind: "yellow", data: "double" })
               }
+            />
+            <FlagButton
+              flag={{ kind: "blue" }}
+              onClick={() => submit(globalTarget, { kind: "blue" })}
             />
             <FlagButton
               flag={{ kind: "safety_car" }}
@@ -186,8 +190,8 @@ export function RaceControlView() {
               onClick={() => submit(globalTarget, { kind: "rain" })}
             />
             <FlagButton
-              flag={{ kind: "custom_blue" }}
-              onClick={() => submit(globalTarget, { kind: "custom_blue" })}
+              flag={{ kind: "blue" }}
+              onClick={() => submit(globalTarget, { kind: "blue" })}
             />
           </div>
         </div>
