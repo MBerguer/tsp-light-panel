@@ -4,6 +4,7 @@ import { TrackMap } from "@/components/TrackMap";
 import { FlagButton } from "@/components/FlagButton";
 import { EventFeed } from "@/components/EventFeed";
 import { MarshalRoster } from "@/components/MarshalRoster";
+import { TimingBar } from "@/components/TimingBar";
 import type { ClientRole } from "@/types/ClientRole";
 import type { CommandTarget } from "@/types/CommandTarget";
 import type { FlagState } from "@/types/FlagState";
@@ -31,6 +32,13 @@ export function RaceControlView() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       <div className="col-span-1 lg:col-span-8 xl:col-span-9 flex flex-col gap-4">
+        {/* MYLAPS Live Timing Status & Chequered Flag Automation */}
+        <TimingBar
+          onDeployChequered={() =>
+            submit(globalTarget, { kind: "chequered" })
+          }
+        />
+
         {/* Marshal Roster Status Board */}
         <MarshalRoster />
 

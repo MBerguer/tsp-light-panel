@@ -22,6 +22,7 @@ pub mod diagnostic;
 pub mod dispatch;
 pub mod flag_propagator;
 pub mod gateway;
+pub mod mylaps;
 pub mod scenario_library;
 pub mod scenario_runtime;
 pub mod topology;

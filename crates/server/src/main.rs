@@ -40,6 +40,7 @@ struct AppState {
     gateway: GatewayState,
     scenarios: Arc<ScenarioController>,
     mode: String,
+    mylaps: tsp_server::mylaps::SharedMylapsState,
 }
 
 impl FromRef<AppState> for GatewayState {
@@ -100,10 +101,15 @@ async fn main() -> Result<()> {
         tracing::warn!(target = %udp_target_str, "invalid TSP_UDP_BROADCAST_ADDR, UDP broadcasting disabled");
     }
 
+    let mylaps_state = Arc::new(tokio::sync::RwLock::new(tsp_server::mylaps::MylapsState::default()));
+    let mylaps_addr = std::env::var("TSP_MYLAPS_ADDR").unwrap_or_else(|_| "127.0.0.1:50000".into());
+    tsp_server::mylaps::spawn_mylaps_client(mylaps_addr, mylaps_state.clone());
+
     let state = AppState {
         gateway: gateway.clone(),
         scenarios: scenarios.clone(),
         mode,
+        mylaps: mylaps_state,
     };
 
     let cors = CorsLayer::new()
@@ -117,6 +123,7 @@ async fn main() -> Result<()> {
         .route("/api/auth/login", axum::routing::post(post_login))
         .route("/api/topology", get(get_topology))
         .route("/api/snapshot", get(get_snapshot))
+        .route("/api/timing/session", get(get_timing_session))
         .route("/api/sim/library", get(get_library))
         .route("/api/sim/run", axum::routing::post(post_run))
         .route("/api/sim/stop", axum::routing::post(post_stop))
@@ -172,6 +179,13 @@ async fn get_config(State(state): State<AppState>) -> Json<ConfigResponse> {
         circuit: topo.name.clone(),
         auth_required: state.mode == "track",
     })
+}
+
+async fn get_timing_session(
+    State(state): State<AppState>,
+) -> Json<tsp_server::mylaps::MylapsState> {
+    let snap = state.mylaps.read().await.clone();
+    Json(snap)
 }
 
 #[derive(serde::Deserialize)]
